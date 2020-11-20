@@ -26,28 +26,28 @@ class BlockquoteTest(unittest.TestCase):
                          "<blockquote><p>This is a blockquote.</p></blockquote>")
 
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     >This a blockquote with extra leading space."),
-                         "<blockquote><p>This a blockquote with extra leading space.</p></blockquote>")
-        self.assertEqual(CONVERT("     >>This a blockquote with extra leading space."),
-                         "<blockquote><p>This a blockquote with extra leading space.</p></blockquote>")
-        self.assertEqual(CONVERT("     >>>This a blockquote with extra leading space."),
-                         "<blockquote><p>This a blockquote with extra leading space.</p></blockquote>")
+        self.assertEqual(CONVERT("     >This a blockquote with 5 extra leading spaces."),
+                         "<blockquote><p>This a blockquote with 5 extra leading spaces.</p></blockquote>")
+        self.assertEqual(CONVERT("     >>This a blockquote with 5 extra leading spaces."),
+                         "<blockquote><p>This a blockquote with 5 extra leading spaces.</p></blockquote>")
+        self.assertEqual(CONVERT("     >>>This a blockquote with 5 extra leading spaces."),
+                         "<blockquote><p>This a blockquote with 5 extra leading spaces.</p></blockquote>")
 
     def test_extra_trailing_space(self):
-        self.assertEqual(CONVERT(">This a blockquote with extra trailing space.     "),
-                         "<blockquote><p>This a blockquote with extra trailing space.</p><br></blockquote>")
-        self.assertEqual(CONVERT(">>This a blockquote with extra trailing space.     "),
-                         "<blockquote><p>This a blockquote with extra trailing space.</p><br></blockquote>")
-        self.assertEqual(CONVERT(">>>This a blockquote with extra trailing space.     "),
-                         "<blockquote><p>This a blockquote with extra trailing space.</p><br></blockquote>")
+        self.assertEqual(CONVERT(">This a blockquote with 5 extra trailing spaces.     "),
+                         "<blockquote><p>This a blockquote with 5 extra trailing spaces.</p><br></blockquote>")
+        self.assertEqual(CONVERT(">>This a blockquote with 5 extra trailing spaces.     "),
+                         "<blockquote><p>This a blockquote with 5 extra trailing spaces.</p><br></blockquote>")
+        self.assertEqual(CONVERT(">>>This a blockquote with 5 extra trailing spaces.     "),
+                         "<blockquote><p>This a blockquote with 5 extra trailing spaces.</p><br></blockquote>")
 
     def test_extra_space(self):
-        self.assertEqual(CONVERT(">     This a blockquote with extra space.     "),
-                         "<blockquote><p>This a blockquote with extra space.</p><br></blockquote>")
-        self.assertEqual(CONVERT(">>     This a blockquote with extra space.     "),
-                         "<blockquote><p>This a blockquote with extra space.</p><br></blockquote>")
-        self.assertEqual(CONVERT(">>>     This a blockquote with extra space.     "),
-                         "<blockquote><p>This a blockquote with extra space.</p><br></blockquote>")
+        self.assertEqual(CONVERT(">     This a blockquote with 5 extra spaces.     "),
+                         "<blockquote><p>This a blockquote with 5 extra spaces.</p><br></blockquote>")
+        self.assertEqual(CONVERT(">>     This a blockquote with 5 extra spaces.     "),
+                         "<blockquote><p>This a blockquote with 5 extra spaces.</p><br></blockquote>")
+        self.assertEqual(CONVERT(">>>     This a blockquote with 5 extra spaces.     "),
+                         "<blockquote><p>This a blockquote with 5 extra spaces.</p><br></blockquote>")
 
     def test_multiline(self):
         self.assertEqual(CONVERT(""">This is a level 1 blockquote.
@@ -148,21 +148,45 @@ class CodeTest(unittest.TestCase):
         self.assertEqual(CONVERT("``This is some code containing `backticks`.``"),
                          "<code>This is some code containing `backticks`.</code>")
 
+    def test_extra_leading_space(self):
+        self.assertEqual(CONVERT("     `This is some text denoted as code with 5 extra leading spaces.`"),
+                         "<code>This is some text denoted as code with 5 extra leading spaces.</code>")
+        self.assertEqual(CONVERT("     This is a `word` denoted as code with 5 extra leading spaces."),
+                         "<p>This is a <code>word</code> denoted as code with 5 extra leading spaces.</p>")
+        self.assertEqual(CONVERT("     These are some letters denoted as `c`o`d`e with 5 extra leading spaces."),
+                         "<p>These are some letters denoted as <code>c</code>o<code>d</code>e with 5 extra leading spaces.</p>")
+        self.assertEqual(CONVERT("     ``This is some code containing `backticks` with 5 extra leading spaces.``"),
+                         "<code>This is some code containing `backticks` with 5 extra leading spaces.</code>")
+
+    def test_extra_trailing_space(self):
+        self.assertEqual(CONVERT("`This is some text denoted as code with 5 extra trailing spaces.`     "),
+                         "<code>This is some text denoted as code with 5 extra trailing spaces.</code><br>")
+        self.assertEqual(CONVERT("This is a `word` denoted as code with 5 extra trailing spaces.     "),
+                         "<p>This is a <code>word</code> denoted as code with 5 extra trailing spaces.</p><br>")
+        self.assertEqual(CONVERT("These are some letters denoted as `c`o`d`e with 5 extra trailing spaces.     "),
+                         "<p>These are some letters denoted as <code>c</code>o<code>d</code>e with 5 extra trailing spaces.</p><br>")
+        self.assertEqual(CONVERT("``This is some code containing `backticks` with 5 extra trailing spaces.``     "),
+                         "<code>This is some code containing `backticks` with 5 extra trailing spaces.</code><br>")
+
     def test_extra_space(self):
-        self.assertEqual(CONVERT("`     This is some text denoted as code.     `"),
-                         "<code>This is some text denoted as code.</code>")
-        self.assertEqual(CONVERT("This is a `     word     ` denoted as code."),
-                         "<p>This is a <code>word</code> denoted as code.</p>")
-        self.assertEqual(CONVERT("These are some letters denoted as `     c     `o`     d     `e."),
-                         "<p>These are some letters denoted as <code>c</code>o<code>d</code>e.</p>")
-        self.assertEqual(CONVERT("``     This is some code containing `backticks`.     ``"),
-                         "<code>This is some code containing `backticks`.</code>")
+        self.assertEqual(CONVERT("`     This is some text denoted as code with 5 extra spaces.     `"),
+                         "<code>This is some text denoted as code with 5 extra spaces.</code>")
+        self.assertEqual(CONVERT("This is a `     word     ` denoted as code with 5 extra spaces."),
+                         "<p>This is a <code>word</code> denoted as code with 5 extra spaces.</p>")
+        self.assertEqual(CONVERT("These are some letters denoted as `     c     `o`     d     `e with 5 extra spaces."),
+                         "<p>These are some letters denoted as <code>c</code>o<code>d</code>e with 5 extra spaces.</p>")
+        self.assertEqual(CONVERT("``     This is some code containing `backticks` with 5 extra spaces.     ``"),
+                         "<code>This is some code containing `backticks` with 5 extra spaces.</code>")
 
     def test_should_not_be_affected(self):
         self.assertEqual(CONVERT("`This should not be affected."),
                          "<p>`This should not be affected.</p>")
         self.assertEqual(CONVERT("This should not be affected.`"),
                          "<p>This should not be affected.`</p>")
+        self.assertEqual(CONVERT("``This should not be affected."),
+                         "<p>``This should not be affected.</p>")
+        self.assertEqual(CONVERT("This should not be affected.``"),
+                         "<p>This should not be affected.``</p>")
 
 
 class EmphasisTest(unittest.TestCase):
@@ -224,60 +248,60 @@ class EmphasisTest(unittest.TestCase):
         self.assertEqual(CONVERT("**Some** __bold__ **words.**"),
                          "<p><strong>Some</strong> <strong>bold</strong> <strong>words.</strong></p>")
 
-    def test_italic_bold(self):
-        self.assertEqual(CONVERT("***This is some italic bold text.***"),
-                         "<p><em><strong>This is some italic bold text.</strong></em></p>")
-        self.assertEqual(CONVERT("___This is some italic bold text.___"),
-                         "<p><em><strong>This is some italic bold text.</strong></em></p>")
-        self.assertEqual(CONVERT("**_This is some italic bold text._**"),
-                         "<p><strong><em>This is some italic bold text.</em></strong></p>")
-        self.assertEqual(CONVERT("__*This is some italic bold text.*__"),
-                         "<p><strong><em>This is some italic bold text.</em></strong></p>")
-        self.assertEqual(CONVERT("*__This is some italic bold text.__*"),
-                         "<p><em><strong>This is some italic bold text.</strong></em></p>")
-        self.assertEqual(CONVERT("_**This is some italic bold text.**_"),
-                         "<p><em><strong>This is some italic bold text.</strong></em></p>")
+    def test_bold_italic(self):
+        self.assertEqual(CONVERT("***This is some bold and italic text.***"),
+                         "<p><em><strong>This is some bold and italic text.</strong></em></p>")
+        self.assertEqual(CONVERT("___This is some bold and italic text.___"),
+                         "<p><em><strong>This is some bold and italic text.</strong></em></p>")
+        self.assertEqual(CONVERT("**_This is some bold and italic text._**"),
+                         "<p><strong><em>This is some bold and italic text.</em></strong></p>")
+        self.assertEqual(CONVERT("__*This is some bold and italic text.*__"),
+                         "<p><strong><em>This is some bold and italic text.</em></strong></p>")
+        self.assertEqual(CONVERT("*__This is some bold and italic text.__*"),
+                         "<p><em><strong>This is some bold and italic text.</strong></em></p>")
+        self.assertEqual(CONVERT("_**This is some bold and italic text.**_"),
+                         "<p><em><strong>This is some bold and italic text.</strong></em></p>")
 
-        self.assertEqual(CONVERT("This is an italic bold ***word***."),
-                         "<p>This is an italic bold <em><strong>word</strong></em>.</p>")
-        self.assertEqual(CONVERT("This is an italic bold ___word___."),
-                         "<p>This is an italic bold <em><strong>word</strong></em>.</p>")
-        self.assertEqual(CONVERT("This is an italic bold **_word_**."),
-                         "<p>This is an italic bold <strong><em>word</em></strong>.</p>")
-        self.assertEqual(CONVERT("This is an italic bold __*word*__."),
-                         "<p>This is an italic bold <strong><em>word</em></strong>.</p>")
-        self.assertEqual(CONVERT("This is an italic bold *__word__*."),
-                         "<p>This is an italic bold <em><strong>word</strong></em>.</p>")
-        self.assertEqual(CONVERT("This is an italic bold _**word**_."),
-                         "<p>This is an italic bold <em><strong>word</strong></em>.</p>")
+        self.assertEqual(CONVERT("This is a bold and italic ***word***."),
+                         "<p>This is a bold and italic <em><strong>word</strong></em>.</p>")
+        self.assertEqual(CONVERT("This is a bold and italic ___word___."),
+                         "<p>This is a bold and italic <em><strong>word</strong></em>.</p>")
+        self.assertEqual(CONVERT("This is a bold and italic **_word_**."),
+                         "<p>This is a bold and italic <strong><em>word</em></strong>.</p>")
+        self.assertEqual(CONVERT("This is a bold and italic __*word*__."),
+                         "<p>This is a bold and italic <strong><em>word</em></strong>.</p>")
+        self.assertEqual(CONVERT("This is a bold and italic *__word__*."),
+                         "<p>This is a bold and italic <em><strong>word</strong></em>.</p>")
+        self.assertEqual(CONVERT("This is a bold and italic _**word**_."),
+                         "<p>This is a bold and italic <em><strong>word</strong></em>.</p>")
 
-        self.assertEqual(CONVERT("These are some i***t***a***l***i***c*** a***n***d ***b***o***l***d letters."),
-                         "<p>These are some i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> a<em><strong>n</strong></em>d <em><strong>b</strong></em>o<em><strong>l</strong></em>d letters.</p>")
-        self.assertEqual(CONVERT("These are some i___t___a___l___i___c___ a___n___d ___b___o___l___d letters."),
-                         "<p>These are some i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> a<em><strong>n</strong></em>d <em><strong>b</strong></em>o<em><strong>l</strong></em>d letters.</p>")
-        self.assertEqual(CONVERT("These are some i**_t_**a**_l_**i**_c_** a**_n_**d **_b_**o**_l_**d letters."),
-                         "<p>These are some i<strong><em>t</em></strong>a<strong><em>l</em></strong>i<strong><em>c</em></strong> a<strong><em>n</em></strong>d <strong><em>b</em></strong>o<strong><em>l</em></strong>d letters.</p>")
-        self.assertEqual(CONVERT("These are some i__*t*__a__*l*__i__*c*__ a__*n*__d __*b*__o__*l*__d letters."),
-                         "<p>These are some i<strong><em>t</em></strong>a<strong><em>l</em></strong>i<strong><em>c</em></strong> a<strong><em>n</em></strong>d <strong><em>b</em></strong>o<strong><em>l</em></strong>d letters.</p>")
-        self.assertEqual(CONVERT("These are some i*__t__*a*__l__*i*__c__* a*__n__*d *__b__*o*__l__*d letters."),
-                         "<p>These are some i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> a<em><strong>n</strong></em>d <em><strong>b</strong></em>o<em><strong>l</strong></em>d letters.</p>")
-        self.assertEqual(CONVERT("These are some i_**t**_a_**l**_i_**c**_ a_**n**_d _**b**_o_**l**_d letters."),
-                         "<p>These are some i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> a<em><strong>n</strong></em>d <em><strong>b</strong></em>o<em><strong>l</strong></em>d letters.</p>")
-        self.assertEqual(CONVERT("These are some i***t***a___l___i**_c_** a__*n*__d *__b__*o_**l**_d letters."),
-                         "<p>These are some i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<strong><em>c</em></strong> a<strong><em>n</em></strong>d <em><strong>b</strong></em>o<em><strong>l</strong></em>d letters.</p>")
+        self.assertEqual(CONVERT("These are some ***b***o***l***d a***n***d i***t***a***l***i***c*** letters."),
+                         "<p>These are some <em><strong>b</strong></em>o<em><strong>l</strong></em>d a<em><strong>n</strong></em>d i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> letters.</p>")
+        self.assertEqual(CONVERT("These are some ___b___o___l___d a___n___d i___t___a___l___i___c___ letters."),
+                         "<p>These are some <em><strong>b</strong></em>o<em><strong>l</strong></em>d a<em><strong>n</strong></em>d i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> letters.</p>")
+        self.assertEqual(CONVERT("These are some **_b_**o**_l_**d a**_n_**d i**_t_**a**_l_**i**_c_** letters."),
+                         "<p>These are some <strong><em>b</em></strong>o<strong><em>l</em></strong>d a<strong><em>n</em></strong>d i<strong><em>t</em></strong>a<strong><em>l</em></strong>i<strong><em>c</em></strong> letters.</p>")
+        self.assertEqual(CONVERT("These are some __*b*__o__*l*__d a__*n*__d i__*t*__a__*l*__i__*c*__ letters."),
+                         "<p>These are some <strong><em>b</em></strong>o<strong><em>l</em></strong>d a<strong><em>n</em></strong>d i<strong><em>t</em></strong>a<strong><em>l</em></strong>i<strong><em>c</em></strong> letters.</p>")
+        self.assertEqual(CONVERT("These are some *__b__*o*__l__*d a*__n__*d i*__t__*a*__l__*i*__c__* letters."),
+                         "<p>These are some <em><strong>b</strong></em>o<em><strong>l</strong></em>d a<em><strong>n</strong></em>d i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> letters.</p>")
+        self.assertEqual(CONVERT("These are some _**b**_o_**l**_d a_**n**_d i_**t**_a_**l**_i_**c**_ letters."),
+                         "<p>These are some <em><strong>b</strong></em>o<em><strong>l</strong></em>d a<em><strong>n</strong></em>d i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<em><strong>c</strong></em> letters.</p>")
+        self.assertEqual(CONVERT("These are some *__b__*o_**l**_d a__*n*__d i***t***a___l___i**_c_** letters."),
+                         "<p>These are some <em><strong>b</strong></em>o<em><strong>l</strong></em>d a<strong><em>n</em></strong>d i<em><strong>t</strong></em>a<em><strong>l</strong></em>i<strong><em>c</em></strong> letters.</p>")
 
-        self.assertEqual(CONVERT("***Some*** ***italic*** ***and*** ***bold*** ***words.***"),
-                         "<p><em><strong>Some</strong></em> <em><strong>italic</strong></em> <em><strong>and</strong></em> <em><strong>bold</strong></em> <em><strong>words.</strong></em></p>")
-        self.assertEqual(CONVERT("___Some___ ___italic___ ___and___ ___bold___ ___words.___"),
-                         "<p><em><strong>Some</strong></em> <em><strong>italic</strong></em> <em><strong>and</strong></em> <em><strong>bold</strong></em> <em><strong>words.</strong></em></p>")
-        self.assertEqual(CONVERT("**_Some_** **_italic_** **_and_** **_bold_** **_words._**"),
-                         "<p><strong><em>Some</em></strong> <strong><em>italic</em></strong> <strong><em>and</em></strong> <strong><em>bold</em></strong> <strong><em>words.</em></strong></p>")
-        self.assertEqual(CONVERT("__*Some*__ __*italic*__ __*and*__ __*bold*__ __*words.*__"),
-                         "<p><strong><em>Some</em></strong> <strong><em>italic</em></strong> <strong><em>and</em></strong> <strong><em>bold</em></strong> <strong><em>words.</em></strong></p>")
-        self.assertEqual(CONVERT("*__Some__* *__italic__* *__and__* *__bold__* *__words.__*"),
-                         "<p><em><strong>Some</strong></em> <em><strong>italic</strong></em> <em><strong>and</strong></em> <em><strong>bold</strong></em> <em><strong>words.</strong></em></p>")
-        self.assertEqual(CONVERT("_**Some**_ _**italic**_ _**and**_ _**bold**_ _**words.**_"),
-                         "<p><em><strong>Some</strong></em> <em><strong>italic</strong></em> <em><strong>and</strong></em> <em><strong>bold</strong></em> <em><strong>words.</strong></em></p>")
+        self.assertEqual(CONVERT("***Some*** ***bold*** ***and*** ***italic*** ***words.***"),
+                         "<p><em><strong>Some</strong></em> <em><strong>bold</strong></em> <em><strong>and</strong></em> <em><strong>italic</strong></em> <em><strong>words.</strong></em></p>")
+        self.assertEqual(CONVERT("___Some___ ___bold___ ___and___ ___italic___ ___words.___"),
+                         "<p><em><strong>Some</strong></em> <em><strong>bold</strong></em> <em><strong>and</strong></em> <em><strong>italic</strong></em> <em><strong>words.</strong></em></p>")
+        self.assertEqual(CONVERT("**_Some_** **_bold_** **_and_** **_italic_** **_words._**"),
+                         "<p><strong><em>Some</em></strong> <strong><em>bold</em></strong> <strong><em>and</em></strong> <strong><em>italic</em></strong> <strong><em>words.</em></strong></p>")
+        self.assertEqual(CONVERT("__*Some*__ __*bold*__ __*and*__ __*italic*__ __*words.*__"),
+                         "<p><strong><em>Some</em></strong> <strong><em>bold</em></strong> <strong><em>and</em></strong> <strong><em>italic</em></strong> <strong><em>words.</em></strong></p>")
+        self.assertEqual(CONVERT("*__Some__* *__bold__* *__and__* *__italic__* *__words.__*"),
+                         "<p><em><strong>Some</strong></em> <em><strong>bold</strong></em> <em><strong>and</strong></em> <em><strong>italic</strong></em> <em><strong>words.</strong></em></p>")
+        self.assertEqual(CONVERT("_**Some**_ _**bold**_ _**and**_ _**italic**_ _**words.**_"),
+                         "<p><em><strong>Some</strong></em> <em><strong>bold</strong></em> <em><strong>and</strong></em> <em><strong>italic</strong></em> <em><strong>words.</strong></em></p>")
 
     def test_should_not_be_affected(self):
         self.assertEqual(CONVERT("*This should not be affected_"),
@@ -396,18 +420,6 @@ class EscapedCharacters(unittest.TestCase):
         self.assertEqual(CONVERT("\>>>This should not be affected."),
                          "<p>>>>This should not be affected.</p>")
 
-    def test_code(self):
-        self.assertEqual(CONVERT("\`This should not be affected.\`"),
-                         "<p>`This should not be affected.`</p>")
-        self.assertEqual(CONVERT("\`\`This should not be affected.\`\`"),
-                         "<p>``This should not be affected.``</p>")
-
-    def test_italic(self):
-        self.assertEqual(CONVERT("\*This should not be affected.\*"),
-                         "<p>*This should not be affected.*</p>")
-        self.assertEqual(CONVERT("\_This should not be affected.\_"),
-                         "<p>_This should not be affected._</p>")
-
     def test_bold(self):
         self.assertEqual(CONVERT("\*\*This should not be affected.\*\*"),
                          "<p>**This should not be affected.**</p>")
@@ -425,6 +437,16 @@ class EscapedCharacters(unittest.TestCase):
                          "<p>*__This should not be affected.__*</p>")
         self.assertEqual(CONVERT("\_\*\*This should not be affected.\*\*\_"),
                          "<p>_**This should not be affected.**_</p>")
+
+    def test_code(self):
+        self.assertEqual(CONVERT("\`This should not be affected.\`"),
+                         "<p>`This should not be affected.`</p>")
+        self.assertEqual(CONVERT("\`\`This should not be affected.\`\`"),
+                         "<p>``This should not be affected.``</p>")
+
+    def test_escaped_paragraph(self):
+        self.assertEqual(CONVERT("\T\h\i\s\ \s\h\o\\u\l\d\ \\n\o\\t\ \\b\e\ \\a\\f\\f\e\c\\t\e\d\."),
+                         "<p>This should not be affected.</p>")
 
     def test_heading(self):
         self.assertEqual(CONVERT("\# This should not be affected."),
@@ -446,20 +468,26 @@ class EscapedCharacters(unittest.TestCase):
         self.assertEqual(CONVERT("\***"), "<p>***</p>")
 
     def test_image(self):
-        self.assertEqual(CONVERT("!\[This should not be affected.](not an image)"),
-                         "<p>![This should not be affected.](not an image)</p>")
-        self.assertEqual(CONVERT("!\[This should not be affected.](not an image \"Not a Title.\")"),
-                         "<p>![This should not be affected.](not an image \"Not a Title.\")</p>")
+        self.assertEqual(CONVERT("!\[This should not be affected.](Not an image.)"),
+                         "<p>![This should not be affected.](Not an image.)</p>")
+        self.assertEqual(CONVERT("!\[This should not be affected.](Not an image. \"Not a Title.\")"),
+                         "<p>![This should not be affected.](Not an image. \"Not a Title.\")</p>")
+
+    def test_italic(self):
+        self.assertEqual(CONVERT("\*This should not be affected.\*"),
+                         "<p>*This should not be affected.*</p>")
+        self.assertEqual(CONVERT("\_This should not be affected.\_"),
+                         "<p>_This should not be affected._</p>")
 
     def test_line_break(self):
         self.assertEqual(CONVERT("Here's a paragraph followed by two spaces instead of a line break. \ "),
                          "<p>Here's a paragraph followed by two spaces instead of a line break.  </p>")
 
     def test_link(self):
-        self.assertEqual(CONVERT("\[This should not be affected.](link)"),
-                         "<p>[This should not be affected.](link)</p>")
-        self.assertEqual(CONVERT("\[This should not be affected.](not a link \"Not a title.\")"),
-                         "<p>[This should not be affected.](not a link \"Not a title.\")</p>")
+        self.assertEqual(CONVERT("\[This should not be affected.](Not a link.)"),
+                         "<p>[This should not be affected.](Not a link.)</p>")
+        self.assertEqual(CONVERT("\[This should not be affected.](Not a link. \"Not a title.\")"),
+                         "<p>[This should not be affected.](Not a link. \"Not a title.\")</p>")
 
     def test_ordered_list(self):
         self.assertEqual(CONVERT("\\1. This should not be affected."),
@@ -468,10 +496,6 @@ class EscapedCharacters(unittest.TestCase):
                          "<p>20. This should not be affected.</p>")
         self.assertEqual(CONVERT("\\300. This should not be affected."),
                          "<p>300. This should not be affected.</p>")
-
-    def test_escaped_paragraph(self):
-        self.assertEqual(CONVERT("\T\h\i\s\ \s\h\o\\u\l\d\ \\n\o\\t\ \\b\e\ \\a\\f\\f\e\c\\t\e\d\."),
-                         "<p>This should not be affected.</p>")
 
     def test_unordered_list(self):
         self.assertEqual(CONVERT("\- This should not be affected."),
@@ -622,24 +646,24 @@ class ImageTest(unittest.TestCase):
                          "<p>![](\"This should not be affected.\")</p>")
 
     def test_image(self):
-        self.assertEqual(CONVERT("![This is an image.](image)"),
-                         "<img src=\"image\" alt=\"This is an image.\">")
-        self.assertEqual(CONVERT("![     This is an image.     ](     image     )"),
-                         "<img src=\"image\" alt=\"This is an image.\">")
-        self.assertEqual(CONVERT("This is an image ![image](image) inside a paragraph."),
-                         "<p>This is an image <img src=\"image\" alt=\"image\"> inside a paragraph.</p>")
-        self.assertEqual(CONVERT("This is an image ![     image     ](     image     ) inside a paragraph."),
-                         "<p>This is an image <img src=\"image\" alt=\"image\"> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("![This is an image.](Image path or URL.)"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\">")
+        self.assertEqual(CONVERT("![     This is an image.     ](     Image path or URL.     )"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\">")
+        self.assertEqual(CONVERT("This is an image ![image](Image path or URL.) inside a paragraph."),
+                         "<p>This is an image <img src=\"Image path or URL.\" alt=\"image\"> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("This is an image ![     image     ](     Image path or URL.     ) inside a paragraph."),
+                         "<p>This is an image <img src=\"Image path or URL.\" alt=\"image\"> inside a paragraph.</p>")
 
     def test_image_with_title(self):
-        self.assertEqual(CONVERT("![This is an image.](image \"Here's a Title.\")"),
-                         "<img src=\"image\" alt=\"This is an image.\" title=\"Here's a Title.\">")
-        self.assertEqual(CONVERT("![     This is an image.     ](     image     \"Here's a Title.\"     )"),
-                         "<img src=\"image\" alt=\"This is an image.\" title=\"Here's a Title.\">")
-        self.assertEqual(CONVERT("This is an image ![image](image \"Here's a title.\") inside a paragraph."),
-                         "<p>This is an image <img src=\"image\" alt=\"image\" title=\"Here's a title.\"> inside a paragraph.</p>")
-        self.assertEqual(CONVERT("This is an image ![     image     ](     image     \"Here's a title.\"     ) inside a paragraph."),
-                         "<p>This is an image <img src=\"image\" alt=\"image\" title=\"Here's a title.\"> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("![This is an image.](Image path or URL. \"This is a title.\")"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\" title=\"This is a title.\">")
+        self.assertEqual(CONVERT("![     This is an image.     ](     Image path or URL.     \"This is a title.\"     )"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\" title=\"This is a title.\">")
+        self.assertEqual(CONVERT("This is an image ![image](Image path or URL. \"This is a title.\") inside a paragraph."),
+                         "<p>This is an image <img src=\"Image path or URL.\" alt=\"image\" title=\"This is a title.\"> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("This is an image ![     image     ](     Image path or URL.     \"This is a title.\"     ) inside a paragraph."),
+                         "<p>This is an image <img src=\"Image path or URL.\" alt=\"image\" title=\"This is a title.\"> inside a paragraph.</p>")
 
 
 class LineBreakTest(unittest.TestCase):
@@ -656,6 +680,20 @@ class LineBreakTest(unittest.TestCase):
                          "<p><strong>Here's some bold text followed by a line break.</strong></p><br>")
         self.assertEqual(CONVERT("__Here's some bold text followed by a line break.__  "),
                          "<p><strong>Here's some bold text followed by a line break.</strong></p><br>")
+
+    def test_bold_italic(self):
+        self.assertEqual(CONVERT("***This is some bold and italic text followed by a line break.***  "),
+                         "<p><em><strong>This is some bold and italic text followed by a line break.</strong></em></p><br>")
+        self.assertEqual(CONVERT("___This is some bold and italic text followed by a line break.___  "),
+                         "<p><em><strong>This is some bold and italic text followed by a line break.</strong></em></p><br>")
+        self.assertEqual(CONVERT("**_This is some bold and italic text followed by a line break._**  "),
+                         "<p><strong><em>This is some bold and italic text followed by a line break.</em></strong></p><br>")
+        self.assertEqual(CONVERT("__*This is some bold and italic text followed by a line break.*__  "),
+                         "<p><strong><em>This is some bold and italic text followed by a line break.</em></strong></p><br>")
+        self.assertEqual(CONVERT("*__This is some bold and italic text followed by a line break.__*  "),
+                         "<p><em><strong>This is some bold and italic text followed by a line break.</strong></em></p><br>")
+        self.assertEqual(CONVERT("_**This is some bold and italic text followed by a line break.**_  "),
+                         "<p><em><strong>This is some bold and italic text followed by a line break.</strong></em></p><br>")
 
     def test_code(self):
         self.assertEqual(CONVERT("`This is some text denoted as code, followed by a line break.`  "),
@@ -680,8 +718,8 @@ class LineBreakTest(unittest.TestCase):
     def test_image(self):
         self.assertEqual(CONVERT("![This is an image followed by a line break.](image)  "),
                          "<img src=\"image\" alt=\"This is an image followed by a line break.\"><br>")
-        self.assertEqual(CONVERT("![This is an image followed by a line break.](image \"Here's a Title.\")  "),
-                         "<img src=\"image\" alt=\"This is an image followed by a line break.\" title=\"Here's a Title.\"><br>")
+        self.assertEqual(CONVERT("![This is an image followed by a line break.](image \"This is a title.\")  "),
+                         "<img src=\"image\" alt=\"This is an image followed by a line break.\" title=\"This is a title.\"><br>")
 
     def test_italic(self):
         self.assertEqual(CONVERT("*This is some italic text followed by a line break.*  "),
@@ -692,8 +730,8 @@ class LineBreakTest(unittest.TestCase):
     def test_link(self):
         self.assertEqual(CONVERT("[This is a link followed by a line break.](link)  "),
                          "<a href=\"link\">This is a link followed by a line break.</a><br>")
-        self.assertEqual(CONVERT("[This is a link followed by a line break.](link \"Here's a title.\")  "),
-                         "<a href=\"link\" title=\"Here's a title.\">This is a link followed by a line break.</a><br>")
+        self.assertEqual(CONVERT("[This is a link followed by a line break.](link \"This is a title.\")  "),
+                         "<a href=\"link\" title=\"This is a title.\">This is a link followed by a line break.</a><br>")
 
     def test_ordered_list(self):
         self.assertEqual(CONVERT("1. This is an ordered list item followed by a line break.  "),
@@ -737,24 +775,24 @@ class LinkTest(unittest.TestCase):
                          "<p>[](\"This should not be affected.\")</p>")
 
     def test_link(self):
-        self.assertEqual(CONVERT("[This is a link.](link)"),
-                         "<a href=\"link\">This is a link.</a>")
-        self.assertEqual(CONVERT("[     This is a link.     ](     link     )"),
-                         "<a href=\"link\">This is a link.</a>")
-        self.assertEqual(CONVERT("This is a [link](link) inside a paragraph."),
-                         "<p>This is a <a href=\"link\">link</a> inside a paragraph.</p>")
-        self.assertEqual(CONVERT("This is a [     link     ](     link     ) inside a paragraph."),
-                         "<p>This is a <a href=\"link\">link</a> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL.)"),
+                         "<a href=\"Link URL.\">This is a link.</a>")
+        self.assertEqual(CONVERT("[     This is a link.     ](     Link URL.     )"),
+                         "<a href=\"Link URL.\">This is a link.</a>")
+        self.assertEqual(CONVERT("This is a [link](Link URL.) inside a paragraph."),
+                         "<p>This is a <a href=\"Link URL.\">link</a> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("This is a [     link     ](     Link URL.     ) inside a paragraph."),
+                         "<p>This is a <a href=\"Link URL.\">link</a> inside a paragraph.</p>")
 
     def test_link_with_title(self):
-        self.assertEqual(CONVERT("[This is a link.](link \"Here's a title.\")"),
-                         "<a href=\"link\" title=\"Here's a title.\">This is a link.</a>")
-        self.assertEqual(CONVERT("[     This is a link.     ](     link     \"Here's a title.\"     )"),
-                         "<a href=\"link\" title=\"Here's a title.\">This is a link.</a>")
-        self.assertEqual(CONVERT("This is a [link](link \"Here's a title.\") inside a paragraph."),
-                         "<p>This is a <a href=\"link\" title=\"Here's a title.\">link</a> inside a paragraph.</p>")
-        self.assertEqual(CONVERT("This is a [     link     ](     link     \"Here's a title.\"     ) inside a paragraph."),
-                         "<p>This is a <a href=\"link\" title=\"Here's a title.\">link</a> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL. \"This is a title.\")"),
+                         "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+        self.assertEqual(CONVERT("[     This is a link.     ](     Link URL.    \"This is a title.\"     )"),
+                         "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+        self.assertEqual(CONVERT("This is a [link](Link URL. \"This is a title.\") inside a paragraph."),
+                         "<p>This is a <a href=\"Link URL.\" title=\"This is a title.\">link</a> inside a paragraph.</p>")
+        self.assertEqual(CONVERT("This is a [     link     ](     Link URL.     \"This is a title.\"     ) inside a paragraph."),
+                         "<p>This is a <a href=\"Link URL.\" title=\"This is a title.\">link</a> inside a paragraph.</p>")
 
 
 class OrderedListTest(unittest.TestCase):
@@ -762,6 +800,10 @@ class OrderedListTest(unittest.TestCase):
         self.assertEqual(CONVERT("1."), "<p>1.</p>")
         self.assertEqual(CONVERT(" 20."), "<p>20.</p>")
         self.assertEqual(CONVERT("  300."), "<p>300.</p>")
+
+        self.assertEqual(CONVERT("1)"), "<p>1)</p>")
+        self.assertEqual(CONVERT(" 20)"), "<p>20)</p>")
+        self.assertEqual(CONVERT("  300)"), "<p>300)</p>")
 
     def test_ordered_list(self):
         self.assertEqual(CONVERT("1. This is an ordered list item."),
@@ -771,29 +813,36 @@ class OrderedListTest(unittest.TestCase):
         self.assertEqual(CONVERT("300. This is an ordered list item."),
                          "<ol><li>This is an ordered list item.</li></ol>")
 
+        self.assertEqual(CONVERT("1) This is an ordered list item."),
+                         "<ol><li>This is an ordered list item.</li></ol>")
+        self.assertEqual(CONVERT("20) This is an ordered list item."),
+                         "<ol><li>This is an ordered list item.</li></ol>")
+        self.assertEqual(CONVERT("300) This is an ordered list item."),
+                         "<ol><li>This is an ordered list item.</li></ol>")
+
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     1. This an ordered list item with extra leading space."),
-                         "<ol><li>This an ordered list item with extra leading space.</li></ol>")
-        self.assertEqual(CONVERT("      20. This an ordered list item with extra leading space."),
-                         "<ol><li>This an ordered list item with extra leading space.</li></ol>")
-        self.assertEqual(CONVERT("       300. This an ordered list item with extra leading space."),
-                         "<ol><li>This an ordered list item with extra leading space.</li></ol>")
+        self.assertEqual(CONVERT("     1. This an ordered list item with 5 extra leading spaces."),
+                         "<ol><li>This an ordered list item with 5 extra leading spaces.</li></ol>")
+        self.assertEqual(CONVERT("      20. This an ordered list item with 5 extra leading spaces."),
+                         "<ol><li>This an ordered list item with 5 extra leading spaces.</li></ol>")
+        self.assertEqual(CONVERT("       300. This an ordered list item with 5 extra leading spaces."),
+                         "<ol><li>This an ordered list item with 5 extra leading spaces.</li></ol>")
 
     def test_extra_trailing_space(self):
-        self.assertEqual(CONVERT("1. This an ordered list item with extra trailing space.     "),
-                         "<ol><li>This an ordered list item with extra trailing space.</li><br></ol>")
-        self.assertEqual(CONVERT("20. This an ordered list item with extra trailing space.     "),
-                         "<ol><li>This an ordered list item with extra trailing space.</li><br></ol>")
-        self.assertEqual(CONVERT("300. This an ordered list item with extra trailing space.     "),
-                         "<ol><li>This an ordered list item with extra trailing space.</li><br></ol>")
+        self.assertEqual(CONVERT("1. This an ordered list item with 5 extra trailing spaces.     "),
+                         "<ol><li>This an ordered list item with 5 extra trailing spaces.</li><br></ol>")
+        self.assertEqual(CONVERT("20. This an ordered list item with 5 extra trailing spaces.     "),
+                         "<ol><li>This an ordered list item with 5 extra trailing spaces.</li><br></ol>")
+        self.assertEqual(CONVERT("300. This an ordered list item with 5 extra trailing spaces.     "),
+                         "<ol><li>This an ordered list item with 5 extra trailing spaces.</li><br></ol>")
 
     def test_extra_space(self):
-        self.assertEqual(CONVERT("1.     This a ordered list item with extra space.     "),
-                         "<ol><li>This a ordered list item with extra space.</li><br></ol>")
-        self.assertEqual(CONVERT("20.     This a ordered list item with extra space.     "),
-                         "<ol><li>This a ordered list item with extra space.</li><br></ol>")
-        self.assertEqual(CONVERT("300.     This a ordered list item with extra space.     "),
-                         "<ol><li>This a ordered list item with extra space.</li><br></ol>")
+        self.assertEqual(CONVERT("1.     This a ordered list item with 5 extra spaces.     "),
+                         "<ol><li>This a ordered list item with 5 extra spaces.</li><br></ol>")
+        self.assertEqual(CONVERT("20.     This a ordered list item with 5 extra spaces.     "),
+                         "<ol><li>This a ordered list item with 5 extra spaces.</li><br></ol>")
+        self.assertEqual(CONVERT("300.     This a ordered list item with 5 extra spaces.     "),
+                         "<ol><li>This a ordered list item with 5 extra spaces.</li><br></ol>")
 
     def test_multiline(self):
         self.assertEqual(CONVERT("""1. This is a level 1 ordered list item.
@@ -843,6 +892,15 @@ class OrderedListTest(unittest.TestCase):
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
 
         self.assertEqual(CONVERT("""
+        1) This is a level 1 ordered list item.
+        2) This is a level 1 ordered list item.
+        3) This is a level 1 ordered list item.
+         1) This is a level 2 ordered list item.
+         2) This is a level 2 ordered list item.
+          3) This is a level 3 ordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
+
+        self.assertEqual(CONVERT("""
         1. This is a level 1 ordered list item.
         1. This is a level 1 ordered list item.
         1. This is a level 1 ordered list item.
@@ -884,18 +942,28 @@ class ParagraphTest(unittest.TestCase):
     def test_paragraph(self):
         self.assertEqual(CONVERT("This is a paragraph."),
                          "<p>This is a paragraph.</p>")
-        self.assertEqual(CONVERT("     This is a paragraph with extra leading space."),
-                         "<p>This is a paragraph with extra leading space.</p>")
-        self.assertEqual(CONVERT("This is a paragraph with extra trailing space (a line break).     "),
-                         "<p>This is a paragraph with extra trailing space (a line break).</p><br>")
-        self.assertEqual(CONVERT("This \nis \na \nmultiline \nparagraph."),
-                         "<p>This is a multiline paragraph.</p>")
-        self.assertEqual(CONVERT("This is a multiline paragraph.  \nIt has a line break."),
-                         "<p>This is a multiline paragraph.<br>It has a line break.</p>")
         self.assertEqual(CONVERT("This is a paragraph.\n\nThis is another paragraph."),
                          "<p>This is a paragraph.</p><p>This is another paragraph.</p>")
         self.assertEqual(CONVERT("This is a paragraph followed by a line break.  \n\nThis is another paragraph."),
                          "<p>This is a paragraph followed by a line break.</p><br><p>This is another paragraph.</p>")
+
+    def test_extra_leading_space(self):
+        self.assertEqual(CONVERT("     This is a paragraph with 5 extra leading spaces."),
+                         "<p>This is a paragraph with 5 extra leading spaces.</p>")
+
+    def test_extra_trailing_space(self):
+        self.assertEqual(CONVERT("This is a paragraph with 5 extra trailing spaces.     "),
+                         "<p>This is a paragraph with 5 extra trailing spaces.</p><br>")
+
+    def test_extra_space(self):
+        self.assertEqual(CONVERT("     This is a paragraph with 5 extra spaces.     "),
+                         "<p>This is a paragraph with 5 extra spaces.</p><br>")
+
+    def test_multiline(self):
+        self.assertEqual(CONVERT("This \nis \na \nmultiline \nparagraph."),
+                         "<p>This is a multiline paragraph.</p>")
+        self.assertEqual(CONVERT("This is a multiline paragraph.  \nIt has a line break."),
+                         "<p>This is a multiline paragraph.<br>It has a line break.</p>")
 
 
 class UnorderedListTest(unittest.TestCase):
@@ -913,28 +981,28 @@ class UnorderedListTest(unittest.TestCase):
                          "<ul><li>This is an unordered list item.</li></ul>")
 
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     - This an unordered list item with extra leading space."),
-                         "<ul><li>This an unordered list item with extra leading space.</li></ul>")
-        self.assertEqual(CONVERT("      - This an unordered list item with extra leading space."),
-                         "<ul><li>This an unordered list item with extra leading space.</li></ul>")
-        self.assertEqual(CONVERT("       - This an unordered list item with extra leading space."),
-                         "<ul><li>This an unordered list item with extra leading space.</li></ul>")
+        self.assertEqual(CONVERT("     - This an unordered list item with 5 extra leading spaces."),
+                         "<ul><li>This an unordered list item with 5 extra leading spaces.</li></ul>")
+        self.assertEqual(CONVERT("      - This an unordered list item with 5 extra leading spaces."),
+                         "<ul><li>This an unordered list item with 5 extra leading spaces.</li></ul>")
+        self.assertEqual(CONVERT("       - This an unordered list item with 5 extra leading spaces."),
+                         "<ul><li>This an unordered list item with 5 extra leading spaces.</li></ul>")
 
     def test_extra_trailing_space(self):
-        self.assertEqual(CONVERT("- This an unordered list item with extra trailing space.     "),
-                         "<ul><li>This an unordered list item with extra trailing space.</li><br></ul>")
-        self.assertEqual(CONVERT("-- This an unordered list item with extra trailing space.     "),
-                         "<ul><li>This an unordered list item with extra trailing space.</li><br></ul>")
-        self.assertEqual(CONVERT("--- This an unordered list item with extra trailing space.     "),
-                         "<ul><li>This an unordered list item with extra trailing space.</li><br></ul>")
+        self.assertEqual(CONVERT("- This an unordered list item with 5 extra trailing spaces.     "),
+                         "<ul><li>This an unordered list item with 5 extra trailing spaces.</li><br></ul>")
+        self.assertEqual(CONVERT("-- This an unordered list item with 5 extra trailing spaces.     "),
+                         "<ul><li>This an unordered list item with 5 extra trailing spaces.</li><br></ul>")
+        self.assertEqual(CONVERT("--- This an unordered list item with 5 extra trailing spaces.     "),
+                         "<ul><li>This an unordered list item with 5 extra trailing spaces.</li><br></ul>")
 
     def test_extra_space(self):
-        self.assertEqual(CONVERT("-     This a unordered list item with extra space.     "),
-                         "<ul><li>This a unordered list item with extra space.</li><br></ul>")
-        self.assertEqual(CONVERT("--     This a unordered list item with extra space.     "),
-                         "<ul><li>This a unordered list item with extra space.</li><br></ul>")
-        self.assertEqual(CONVERT("---     This a unordered list item with extra space.     "),
-                         "<ul><li>This a unordered list item with extra space.</li><br></ul>")
+        self.assertEqual(CONVERT("-     This a unordered list item with 5 extra spaces.     "),
+                         "<ul><li>This a unordered list item with 5 extra spaces.</li><br></ul>")
+        self.assertEqual(CONVERT("--     This a unordered list item with 5 extra spaces.     "),
+                         "<ul><li>This a unordered list item with 5 extra spaces.</li><br></ul>")
+        self.assertEqual(CONVERT("---     This a unordered list item with 5 extra spaces.     "),
+                         "<ul><li>This a unordered list item with 5 extra spaces.</li><br></ul>")
 
     def test_multiline(self):
         self.assertEqual(CONVERT("""- This is a level 1 unordered list item.
