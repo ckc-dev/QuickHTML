@@ -33,7 +33,6 @@ class NestedTag:
         </ul>
     </ul>
     """
-
     def __init__(self, regex, opening_tag, inner_opening_tag):
         """
         Initialize a new nested tag.
@@ -104,7 +103,6 @@ def open_nested_tag(line, tag):
     Returns:
         new_line (str) : Converted string.
     """
-
     new_line = ""
 
     # Initialize last and current levels.
@@ -177,7 +175,6 @@ def line_is_paragraph(line):
     Returns:
         bool: Whether or not the line is a paragraph.
     """
-
     # A paragraph can start with a "<br>", but not just be a "<br>".
     return line.strip() not in ("", "<br>") and not line.lstrip().startswith(INDEPENDENT_TAGS)
 
@@ -192,7 +189,6 @@ def convert(string):
     Returns:
         new_string (str): HTML code.
     """
-
     # If string is empty, just return it.
     if string.strip() == "":
         return ""
@@ -224,7 +220,7 @@ def convert(string):
         line = REGEX_CODE.sub("<code>\\1\\2</code>", line)
 
         # Add images and links.
-        # The order here is important, otherwise linked images wouldn't work.
+        # The order here is important, otherwise images wouldn't work.
         if REGEX_IMAGE.search(line):
             # Check if image has a title.
             if REGEX_IMAGE.search(line)[3]:

@@ -29,15 +29,15 @@ def main():
     Converts Markdown into HTML and prints it to the terminal.
     """
     # No argument was provided or arguments were empty strings.
-    if not ARGS or all(ARG.strip() == "" for ARG in ARGS):
+    if not ARGS or all(arg.strip() == "" for arg in ARGS):
         print(MESSAGES["NO_ARGUMENT"])
     # Display help message.
     elif len(ARGS) == 1 and ARGS[0] in ("--help", "-h"):
         print(MESSAGES["HELP"])
     else:
         # Convert and print each argument.
-        for ARG in ARGS:
-            print(convert_file(ARG) if os.path.isfile(ARG) else convert(ARG))
+        for arg in ARGS:
+            print(convert_file(arg) if os.path.isfile(arg) else convert(arg))
 
 
 if __name__ == "__main__":
