@@ -1,6 +1,7 @@
 """
 This is a simple Markdown to HTML preprocessor that doesn't require third-party modules.
 """
+
 import re
 
 # Initialize constants and compile RegEx.
@@ -215,6 +216,7 @@ class NestedTag:
         </ul>
     </ul>
     """
+
     def __init__(self, regex, opening_tag, inner_opening_tag):
         """
         Initialize a new nested tag.
@@ -224,6 +226,7 @@ class NestedTag:
             opening_tag (str): Main, outer opening tag. E.g., "<ul>".
             inner_opening_tag (str): Secondary, inner opening tag. E.g., "<li>".
         """
+
         self.levels = []
         self.regex = regex
         self.opening_tag = opening_tag
@@ -285,6 +288,7 @@ def open_nested_tag(line, tag):
     Returns:
         new_line (str) : Converted string.
     """
+
     new_line = ""
 
     # Initialize last and current levels.
@@ -342,6 +346,7 @@ def close_nested_tag(tag):
     Returns:
         new_line (str): Closing tags.
     """
+
     new_line = len(tag.levels) * tag.closing_tag
     tag.levels[:] = []
     return new_line
@@ -357,6 +362,7 @@ def line_is_paragraph(line):
     Returns:
         bool: Whether or not the line is a paragraph.
     """
+
     # A paragraph can start with a "<br>", but not just be a "<br>".
     return line.strip() not in ("", "<br>") and not line.lstrip().startswith(INDEPENDENT_TAGS)
 
@@ -371,6 +377,7 @@ def convert(string):
     Returns:
         new_string (str): HTML code.
     """
+
     # If string is empty, just return it.
     if string.strip() == "":
         return ""
@@ -497,5 +504,6 @@ def convert_file(file):
     Returns:
         str: HTML code.
     """
+
     with open(file) as f:
         return convert(f.read())
