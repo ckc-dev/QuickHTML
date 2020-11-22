@@ -1,6 +1,7 @@
 """
 This file is executed when running the module directly.
 """
+
 import os
 import sys
 from quickhtml import convert, convert_file
@@ -28,6 +29,7 @@ def main():
     """
     Converts Markdown into HTML and prints it to the terminal.
     """
+
     # No argument was provided or arguments were empty strings.
     if not ARGS or all(arg.strip() == "" for arg in ARGS):
         print(MESSAGES["NO_ARGUMENT"])

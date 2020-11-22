@@ -1,6 +1,7 @@
 """
 Unit tests for QuickHTML, sorted alphabetically.
 """
+
 import unittest
 import importlib.util
 from pathlib import Path
