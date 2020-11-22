@@ -4,19 +4,201 @@ This is a simple Markdown to HTML preprocessor that doesn't require third-party 
 import re
 
 # Initialize constants and compile RegEx.
-REGEX_BLOCKQUOTE = re.compile(r"^\ *(>+)\ *([^\s>].*?)\ *$")
-REGEX_BOLD = re.compile(r"(?<!\\)\*{2}([^\s*].*?)(?<![\\\s*])\*{2}|(?<!\\)_{2}([^\s_].*?)(?<![\\\s_])_{2}")
-REGEX_CODE = re.compile(r"(?<!\\)`{2}\ *(.+?)\ *(?<!\\)`{2}(?=[^`]|$)|(?<!\\)`\ *(.+?)\ *(?<!\\)`(?=[^`]|$)")
-REGEX_ESCAPED_CHARACTER = re.compile(r"\\(.)")
-REGEX_HEADING = re.compile(r"((^|>|-|[0-9][.)])\ *)(\#{1,6})\ +([^\s].*?)(\ *)$")
-REGEX_HORIZONTAL_RULE = re.compile(r"^\ *\*{3,}\ *$|^\ *-{3,}\ *$|^\ *_{3,}\ *$")
-REGEX_IMAGE = re.compile(r"(?<!\\)!\[\ *([^]]+?)\ *]\(\ *([^)]+?)\ *[\"'](.+?)[\"']\ *\)|(?<!\\)!\[\ *(.+?)\ *]\(\ *(.+?)\ *\)")
-REGEX_ITALIC = re.compile(r"(?<!\\)\*([^\s*].*?)(?<![\\\s*])\*|(?<!\\)_([^\s_].*?)(?<![\\\s_])_")
-REGEX_LINK = re.compile(r"(?<!\\)\[\ *(.+?)\ *]\(\ *(.+?)\ *[\"']\ *(.+?)\ *[\"']\ *\)|(?<!\\)\[\ *(.+?)\ *]\(\ *(.+?)\ *\)")
-REGEX_ORDERED_LIST = re.compile(r"^(\ +)?[0-9]+[.)]\ +(.+?)\ *$")
-REGEX_UNORDERED_LIST = re.compile(r"^(\ +)?[-*+]+\ +(.+?)\ *$")
+REGEX_BLOCKQUOTE = re.compile(r"""
+    ^           # Match line start.
+    \ *         # Match between 0 and ∞ whitespaces.
+    (>+)        # CAPTURE GROUP (blockquote level) | Match between 1 and ∞ ">".
+    \ *         # Match between 0 and ∞ whitespaces.
+    ([^\s>].*?) # CAPTURE GROUP (blockquote contents) | Match first character that is not
+                # ">" or a whitespace, then match between 0 and ∞ characters, as few times as possible.
+    \ *         # Match between 0 and ∞ whitespaces.
+    $           # Match line end.""", re.VERBOSE)
+
+REGEX_BOLD = re.compile(r"""
+    (?<!\\)         # Ensure there's no escaping backslash.
+    \*{2}           # Match "*" twice.
+    ([^\s*].*?)     # CAPTURE GROUP | Match first character that is not "*" or a whitespace,
+                    # then match between 0 and ∞ characters, as few times as possible.
+    (?<![\\\s*])    # Ensure there's no escaping backslash, whitespace, or "*".
+    \*{2}           # Match "*" twice.
+    |               # OR
+    (?<!\\)         # Ensure there's no escaping backslash.
+    _{2}            # Match "_" twice.
+    ([^\s_].*?)     # CAPTURE GROUP | Match first character that is not "_" or a whitespace,
+                    # then match between 0 and ∞ characters, as few times as possible.
+    (?<![\\\s_])    # Ensure there's no escaping backslash, whitespace, or "_".
+    _{2}            # Match "_" twice.""", re.VERBOSE)
+
+REGEX_CODE = re.compile(r"""
+    (?<!\\)     # Ensure there's no escaping backslash.
+    `{2}        # Match "`" twice.
+    \ *         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP | Match between 1 and ∞ characters, as few times as possible.
+    \ *         # Match between 0 and ∞ whitespaces.
+    (?<!\\)     # Ensure there's no escaping backslash.
+    `{2}        # Match "`" twice.
+    (?=[^`]|$)  # Make sure there is a line end or a character other than "`" ahead.
+    |           # OR
+    (?<!\\)     # Ensure there's no escaping backslash.
+    `           # Match "`" once.
+    \ *         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP | Match between 1 and ∞ characters, as few times as possible.
+    \ *         # Match between 0 and ∞ whitespaces.
+    (?<!\\)     # Ensure there's no escaping backslash.
+    `           # Match "`" once.
+    (?=[^`]|$)  # Make sure there is a line end or a character other than "`" ahead.""", re.VERBOSE)
+
+REGEX_ESCAPED_CHARACTER = re.compile(r"""
+    \\  # Match "\" once.
+    (.) # Match any character once.""", re.VERBOSE)
+
+REGEX_HEADING = re.compile(r"""
+    ((^|>|-|[0-9][.)])\ *)  # CAPTURE GROUP | Match either line start, ">", "-", or a number followed by "." or ")",
+                            # then, match between 0 and ∞ whitespaces.
+    (\#{1,6})               # CAPTURE GROUP | Match "#" between 1 and 6 times.
+    \ +                     # Match between 1 and ∞ whitespaces.
+    ([^\s].*?)              # CAPTURE GROUP | Match first character that is not a whitespace,
+                            # then match between 0 and ∞ characters, as few times as possible.
+    (\ *)                   # Match between 0 and ∞ whitespaces.
+    $                       # Match line end.""", re.VERBOSE)
+
+REGEX_HORIZONTAL_RULE = re.compile(r"""
+    ^       # Match line start.
+    \ *     # Match between 0 and ∞ whitespaces.
+    \*{3,}  # Match "*" at least 3 times.
+    \ *     # Match between 0 and ∞ whitespaces.
+    $       # Match line end.
+    |       # OR
+    ^       # Match line start.
+    \ *     # Match between 0 and ∞ whitespaces.
+    -{3,}   # Match "-" at least 3 times.
+    \ *     # Match between 0 and ∞ whitespaces.
+    $       # Match line end.
+    |       # OR
+    ^       # Match line start.
+    \ *     # Match between 0 and ∞ whitespaces.
+    _{3,}   # Match "_" at least 3 times.
+    \ *     # Match between 0 and ∞ whitespaces.
+    $       # Match line end.""", re.VERBOSE)
+
+REGEX_IMAGE = re.compile(r"""
+    (?<!\\)     # Ensure there's no escaping backslash.
+    !           # Match "!" once.
+    \[          # Match "[" once.
+    \ *         # Match between 0 and ∞ whitespaces.
+    ([^]]+?)    # CAPTURE GROUP | Match between 1 and ∞ characters,
+                # as few times as possible.
+    \ *         # Match between 0 and ∞ whitespaces.
+    ]           # Match "]" once.
+    \(          # Match "(" once.
+    \ *         # Match between 0 and ∞ whitespaces.
+    ([^)]+?)    # CAPTURE GROUP | Match between 1 and ∞ characters,
+                # as few times as possible.
+    \ *         # Match between 0 and ∞ whitespaces.
+    [\"']       # Match either "'" or '"' once.
+    (.+?)       # CAPTURE GROUP | Match between 1 and ∞ characters,
+                # as few times as possible.
+    [\"']       # Match either "'" or '"' once.
+    \ *         # Match between 0 and ∞ whitespaces.
+    \)          # Match ")" once.
+    |           # OR
+    (?<!\\)     # Ensure there's no escaping backslash.
+    !           # Match "!" once.
+    \[          # Match "[" once.
+    \ *         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP | Match between 1 and ∞ characters,
+                # as few times as possible.
+    \ *         # Match between 0 and ∞ whitespaces.
+    ]           # Match "]" once.
+    \(          # Match "(" once.
+    \ *         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP | Match between 1 and ∞ characters,
+                # as few times as possible.
+    \ *         # Match between 0 and ∞ whitespaces.
+    \)          # Match ")" once.""", re.VERBOSE)
+
+REGEX_ITALIC = re.compile(r"""
+    (?<!\\)         # Ensure there's no escaping backslash.
+    \*              # Match "*" once.
+    ([^\s*].*?)     # CAPTURE GROUP | Match first character that is not "*" or a whitespace,
+                    # then match between 0 and ∞ characters, as few times as possible.
+    (?<![\\\s*])    # Ensure there's no escaping backslash, whitespace, or "*".
+    \*              # Match "*" once.
+    |               # OR
+    (?<!\\)         # Ensure there's no escaping backslash.
+    _               # Match "_" once.
+    ([^\s_].*?)     # CAPTURE GROUP | Match first character that is not "_" or a whitespace,
+                    # then match between 0 and ∞ characters, as few times as possible.
+    (?<![\\\s_])    # Ensure there's no escaping backslash, whitespace, or "_".
+    _               # Match "_" once.""", re.VERBOSE)
+
+REGEX_LINK = re.compile(r"""
+    (?<!\\) # Ensure there's no escaping backslash.
+    \[      # Match "[" once.
+    \ *     # Match between 0 and ∞ whitespaces.
+    (.+?)   # CAPTURE GROUP | Match between 1 and ∞ characters,
+            # as few times as possible.
+    \ *     # Match between 0 and ∞ whitespaces.
+    ]       # Match "]" once.
+    \(      # Match "(" once.
+    \ *     # Match between 0 and ∞ whitespaces.
+    (.+?)   # CAPTURE GROUP | Match between 1 and ∞ characters,
+            # as few times as possible.
+    \ *     # Match between 0 and ∞ whitespaces.
+    [\"']   # Match either '"' or "'" once.
+    \ *     # Match between 0 and ∞ whitespaces.
+    (.+?)   # CAPTURE GROUP | Match between 1 and ∞ characters,
+            # as few times as possible.
+    \ *     # Match between 0 and ∞ whitespaces.
+    [\"']   # Match either '"' or "'" once.
+    \ *     # Match between 0 and ∞ whitespaces.
+    \)      # Match ")" once.
+    |       # OR
+    (?<!\\) # Ensure there's no escaping backslash.
+    \[      # Match "[" once.
+    \ *     # Match between 0 and ∞ whitespaces.
+    (.+?)   # CAPTURE GROUP | Match between 1 and ∞ characters,
+            # as few times as possible.
+    \ *     # Match between 0 and ∞ whitespaces.
+    ]       # Match "]" once.
+    \(      # Match "(" once.
+    \ *     # Match between 0 and ∞ whitespaces.
+    (.+?)   # CAPTURE GROUP | Match between 1 and ∞ characters,
+            # as few times as possible.
+    \ *     # Match between 0 and ∞ whitespaces.
+    \)      # Match ")" once.""", re.VERBOSE)
+
+REGEX_ORDERED_LIST = re.compile(r"""
+    ^       # Match line start.
+    (\ +)?  # CAPTURE GROUP | Match between 1 and ∞ whitespaces,
+            # as many times as possible, as either one or zero matches.
+    [0-9]+  # Match between 1 and ∞ numbers.
+    [.)]    # Match either "." or ")" once.
+    \ +     # Match between 1 and ∞ whitespaces.
+    (.+?)   # CAPTURE GROUP | Match between 1 and ∞ characters,
+            # as few times as possible.
+    \ *     # Match between 0 and ∞ whitespaces.
+    $       # Match line end.""", re.VERBOSE)
+
+REGEX_UNORDERED_LIST = re.compile(r"""
+    ^       # Match line start.
+    (\ +)?  # CAPTURE GROUP | Match between 1 and ∞ whitespaces,
+            # as many times as possible, as either one or zero matches.
+    [-*+]+  # Match between 1 and ∞ "-", "*", or "+".
+    \ +     # Match between 1 and ∞ whitespaces.
+    (.+?)   # CAPTURE GROUP | Match between 1 and ∞ characters,
+            # as few times as possible.
+    \ *     # Match between 0 and ∞ whitespaces.
+    $       # Match line end.""", re.VERBOSE)
+
 # Tags that do not need be enclosed in <p> tags:
-INDEPENDENT_TAGS = ("<h", "<a", "<img", "<code", "<blockquote",)
+INDEPENDENT_TAGS = (
+    "<h",           # Headings and horizontal rules.
+    "<a",           # Links.
+    "<img",         # Images.
+    "<code",        # Code.
+    "<blockquote",  # Blockquotes.
+)
 
 
 # Class for nested tags, such as <ol>, <ul>, and <blockquote>.
