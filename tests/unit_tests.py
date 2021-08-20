@@ -1,10 +1,9 @@
-"""
-Unit tests for QuickHTML, sorted alphabetically.
-"""
+"""This file contains unit tests, sorted alphabetically."""
 
-import unittest
 import importlib.util
+import unittest
 from pathlib import Path
+
 MODULE_FILE = Path(__file__).joinpath("../../quickhtml/quickhtml.py").resolve()
 SPEC = importlib.util.spec_from_file_location("quickhtml", MODULE_FILE)
 QUICKHTML_MODULE = importlib.util.module_from_spec(SPEC)
