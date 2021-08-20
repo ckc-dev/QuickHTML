@@ -58,7 +58,7 @@ REGEX_ESCAPED_CHARACTER = re.compile(r"""
     (.) # CAPTURE GROUP (1) | Match any character once.""", re.VERBOSE)
 
 REGEX_HEADING = re.compile(r"""
-    ((^|>|-|[0-9][.)])\ *)  # CAPTURE GROUP (1) | Match either line start, ">",
+    ((^|>|-|[0-9]+[.)])\ *)  # CAPTURE GROUP (1) | Match either line start, ">",
                             # "-", or a number followed by "." or ")", then,
                             # match between 0 and ∞ whitespaces.
     (\#{1,6})               # CAPTURE GROUP (3) | Match "#" between 1 and 6
