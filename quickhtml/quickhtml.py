@@ -210,119 +210,113 @@ class NestedTag:
         self.inner_opening_tag = inner_opening_tag
         self.inner_closing_tag = inner_opening_tag.replace("<", "</")
 
+    def open(self, line):
+        """
+        Open one or more tags, converting Markdown to HTML.
 
-def open_nested_tag(line, tag):
-    """
-    Convert Markdown into HTML for nested tags.
+        Conversion is based on the level of the last consecutive element,
+        opening a new tag if current level is greater than the last, and
+        closing the last tag if the current level is lesser than the last.
 
-    Conversion is based on the level of the last consecutive element using the
-    same tag, opening a new tag if current level is greater than the last, and
-    closing last tag if current level is lesser than the last.
+        E.g.:
+            > Quote Level 1
+            Becomes:
 
-    E.g.:
-        > Quote Level 1
-        Becomes:
-
-        <blockquote>
-            <p>Quote Level 1</p>
-
-        > Quote Level 1
-        >> Quote Level 2
-        > Quote Level 1
-        Becomes (after function runs on the three lines):
-
-        <blockquote>
-            <p>Quote Level 1</p>
             <blockquote>
-                <p>Quote Level 2</p>
-            </blockquote>
-            <p>Quote Level 1</p>
+                <p>Quote Level 1</p>
 
-        > Quote Level 1
-        >> Quote Level 2
-        >>> Quote Level 3
-        >>>> Quote Level 4
-        Becomes (after function runs on the four lines):
+            > Quote Level 1
+            >> Quote Level 2
+            > Quote Level 1
+            Becomes (after function runs on the three lines):
 
-        <blockquote>
-            <p>Quote Level 1</p>
             <blockquote>
-                <p>Quote Level 2</p>
+                <p>Quote Level 1</p>
                 <blockquote>
-                    <p>Quote Level 3</p>
+                    <p>Quote Level 2</p>
+                </blockquote>
+                <p>Quote Level 1</p>
+
+            > Quote Level 1
+            >> Quote Level 2
+            >>> Quote Level 3
+            >>>> Quote Level 4
+            Becomes (after function runs on the four lines):
+
+            <blockquote>
+                <p>Quote Level 1</p>
+                <blockquote>
+                    <p>Quote Level 2</p>
                     <blockquote>
-                        <p>Quote Level 4</p>
+                        <p>Quote Level 3</p>
+                        <blockquote>
+                            <p>Quote Level 4</p>
 
-    Args:
-        line (str): Line to convert. E.g.: "> Quote Level 1".
-        tag (NestedTag): Tag to use. E.g.: `TAG_BLOCKQUOTE`.
+        Args:
+            line (str): Line to convert. E.g.: "> Quote Level 1".
 
-    Returns:
-        new_line (str) : Converted string.
-    """
-    new_line = ""
+        Returns:
+            new_line (str) : Converted string.
+        """
+        new_line = ""
 
-    try:
-        last_level = tag.levels[-1]
-    except IndexError:
-        last_level = 0
-    try:
-        # 1 is added to ensure current level is never less than 1.
-        current_level = len(tag.regex.match(line)[1]) + 1
-    except TypeError:
-        current_level = 1
+        try:
+            last_level = self.levels[-1]
+        except IndexError:
+            last_level = 0
+        try:
+            # 1 is added to ensure current level is never less than 1.
+            current_level = len(self.regex.match(line)[1]) + 1
+        except TypeError:
+            current_level = 1
 
-    content = tag.regex.match(line)[2]
+        content = self.regex.match(line)[2]
 
-    # If current level is greater than last level, add main opening tag along
-    # with inner tags to line, and append current level to levels.
-    if current_level > last_level:
-        new_line = tag.regex.sub(
-            f"{tag.opening_tag}{tag.inner_opening_tag}{content}{tag.inner_closing_tag}", line)
-        tag.levels.append(current_level)
+        # If current level is greater than last level, add main opening tag
+        # along with inner tags to line, and append current level to levels.
+        if current_level > last_level:
+            new_line = self.regex.sub(
+                f"{self.opening_tag}{self.inner_opening_tag}{content}{self.inner_closing_tag}", line)
+            self.levels.append(current_level)
 
-    # If current level is lesser than last level, go through levels, closing
-    # tags until a level is not greater than current level.
-    elif current_level < last_level:
-        for level in reversed(tag.levels):
-            if level > current_level:
-                new_line += tag.closing_tag
-                tag.levels.remove(level)
-            else:
-                break
-        new_line += tag.regex.sub(
-            f"{tag.inner_opening_tag}{content}{tag.inner_closing_tag}", line)
+        # If current level is lesser than last level, go through levels,
+        # closing tags until a level is not greater than current level.
+        elif current_level < last_level:
+            for level in reversed(self.levels):
+                if level > current_level:
+                    new_line += self.closing_tag
+                    self.levels.remove(level)
+                else:
+                    break
+            new_line += self.regex.sub(
+                f"{self.inner_opening_tag}{content}{self.inner_closing_tag}", line)
 
-    # If the current level is the same as the last level, just add inner tags
-    # to the line.
-    else:
-        new_line = tag.regex.sub(
-            f"{tag.inner_opening_tag}{content}{tag.inner_closing_tag}", line)
-    return new_line
+        # If the current level is the same as the last level, just add inner
+        # tags to the line.
+        else:
+            new_line = self.regex.sub(
+                f"{self.inner_opening_tag}{content}{self.inner_closing_tag}", line)
+        return new_line
 
+    def close(self):
+        """
+        Close one or more tags.
 
-def close_nested_tag(tag):
-    """
-    Close a nested tag.
+        Returns a line with required amount of closing tags based on level of
+        the last element using the same tag, then clears tag level.
 
-    Returns a line with required amount of closing tags based on level of the
-    last element using the same tag, and clears tag level.
-
-    E.g.:
+        E.g.:
+                        </blockquote>
                     </blockquote>
                 </blockquote>
             </blockquote>
-        </blockquote>
 
-    Args:
-        tag (NestedTag): Tag to use. E.g.: TAG_BLOCKQUOTE.
-
-    Returns:
-        new_line (str): Closing tags.
-    """
-    new_line = len(tag.levels) * tag.closing_tag
-    tag.levels[:] = []
-    return new_line
+        Returns:
+            new_line (str): Closing tags.
+        """
+        new_line = len(self.levels) * self.closing_tag
+        self.levels[:] = []
+        return new_line
 
 
 def is_paragraph(line):
@@ -407,29 +401,29 @@ def convert(string):
 
         # Line is an unordered list.
         if REGEX_UNORDERED_LIST.search(line):
-            new_line = open_nested_tag(line, TAG_UNORDERED_LIST)
+            new_line = TAG_UNORDERED_LIST.open(line)
 
         # Line is not an unordered list, but there are still open <ul> tags.
         elif len(TAG_UNORDERED_LIST.levels) > 0:
-            new_line = (close_nested_tag(TAG_UNORDERED_LIST)
+            new_line = (TAG_UNORDERED_LIST.close()
                         + (f"<p>{line}</p>"if is_paragraph(line) else line))
 
         # Line is an ordered list.
         elif REGEX_ORDERED_LIST.search(line):
-            new_line = open_nested_tag(line, TAG_ORDERED_LIST)
+            new_line = TAG_ORDERED_LIST.open(line)
 
         # Line is not an ordered list, but there are still open <ol> tags.
         elif len(TAG_ORDERED_LIST.levels) > 0:
-            new_line = (close_nested_tag(TAG_ORDERED_LIST)
+            new_line = (TAG_ORDERED_LIST.close()
                         + (f"<p>{line}</p>"if is_paragraph(line) else line))
 
         # Line is a blockquote.
         elif REGEX_BLOCKQUOTE.search(line):
-            new_line = open_nested_tag(line, TAG_BLOCKQUOTE)
+            new_line = TAG_BLOCKQUOTE.open(line)
 
         # Line is not a blockquote, but there are still open <blockquote> tags.
         elif len(TAG_BLOCKQUOTE.levels) > 0:
-            new_line = (close_nested_tag(TAG_BLOCKQUOTE)
+            new_line = (TAG_BLOCKQUOTE.close()
                         + (f"<p>{line}</p>"if is_paragraph(line) else line))
 
         # Line is a paragraph.
