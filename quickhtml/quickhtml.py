@@ -4,13 +4,13 @@ import re
 
 REGEX_BLOCKQUOTE = re.compile(r"""
     ^           # Match line start.
-    \ *         # Match between 0 and ∞ whitespaces.
+    \s*         # Match between 0 and ∞ whitespaces.
     (>+)        # CAPTURE GROUP (1) | Match between 1 and ∞ ">".
-    \ *         # Match between 0 and ∞ whitespaces.
-    ([^\s>].*?) # CAPTURE GROUP (2) | Match first character that is not ">" or
-                # a whitespace, then match between 0 and ∞ characters, as few
-                # times as possible.
-    \ *         # Match between 0 and ∞ whitespaces.
+    \s*         # Match between 0 and ∞ whitespaces.
+    ([^>].*?)   # CAPTURE GROUP (2) | Match first character that is not ">",
+                # then match between 0 and ∞ characters, as few times as
+                # possible.
+    \s*         # Match between 0 and ∞ whitespaces.
     $           # Match line end.""", re.VERBOSE)
 
 REGEX_BOLD = re.compile(r"""
@@ -32,24 +32,25 @@ REGEX_BOLD = re.compile(r"""
 
 REGEX_CODE = re.compile(r"""
     (?<!\\)     # Ensure there's no escaping backslash.
-    `{2}        # Match "`" twice.
-    \ *         # Match between 0 and ∞ whitespaces.
-    (.+?)       # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+    (?:         # Open non-capturing group.
+        `{2}    # Match "`" twice.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
                 # times as possible.
-    \ *         # Match between 0 and ∞ whitespaces.
-    (?<!\\)     # Ensure there's no escaping backslash.
-    `{2}        # Match "`" twice.
-    (?=[^`]|$)  # Make sure there is a line end or a character other than "`"
-                # ahead.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (?<!\\) # Ensure there's no escaping backslash.
+        `{2}    # Match "`" twice.
+    )           # Close and match non-capturing group.
     |           # OR
-    (?<!\\)     # Ensure there's no escaping backslash.
-    `           # Match "`" once.
-    \ *         # Match between 0 and ∞ whitespaces.
-    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
+    (?:         # Open non-capturing group.
+        `       # Match "`" once.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
                 # times as possible.
-    \ *         # Match between 0 and ∞ whitespaces.
-    (?<!\\)     # Ensure there's no escaping backslash.
-    `           # Match "`" once.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (?<!\\) # Ensure there's no escaping backslash.
+        `       # Match "`" once.
+    )           # Close and match non-capturing group.
     (?=[^`]|$)  # Make sure there is a line end or a character other than "`"
                 # ahead.""", re.VERBOSE)
 
@@ -58,72 +59,50 @@ REGEX_ESCAPED_CHARACTER = re.compile(r"""
     (.) # CAPTURE GROUP (1) | Match any character once.""", re.VERBOSE)
 
 REGEX_HEADING = re.compile(r"""
-    ((^|>|-|[0-9]+[.)])\ *)  # CAPTURE GROUP (1) | Match either line start, ">",
-                            # "-", or a number followed by "." or ")", then,
-                            # match between 0 and ∞ whitespaces.
-    (\#{1,6})               # CAPTURE GROUP (3) | Match "#" between 1 and 6
-                            # times.
-    \ +                     # Match between 1 and ∞ whitespaces.
-    ([^\s].*?)              # CAPTURE GROUP (4) | Match first character that
-                            # is not a whitespace, then match between 0 and ∞
-                            # characters, as few times as possible.
-    (\ *)                   # CAPTURE GROUP (5) | Match between 0 and ∞
-                            # whitespaces.
-    $                       # Match line end.""", re.VERBOSE)
+    ((?:^|>|-|[0-9]+[.\)])\s*)  # CAPTURE GROUP (1) | Match either line start,
+                                # ">", "-", or a number followed by either "."
+                                # or ")", then match between 0 and ∞
+                                # whitespaces.
+    (\#{1,6})                   # CAPTURE GROUP (2) | Match "#" between 1 and 6
+                                # times.
+    \s+                         # Match between 1 and ∞ whitespaces.
+    ([^\s].*?)                  # CAPTURE GROUP (3) | Match first character
+                                # that is not a whitespace, then match between
+                                # 0 and ∞ characters, as few times as possible.
+    (\s*)                       # CAPTURE GROUP (4) | Match between 0 and ∞
+                                # whitespaces.
+    $                           # Match line end.""", re.VERBOSE)
 
 REGEX_HORIZONTAL_RULE = re.compile(r"""
-    ^       # Match line start.
-    \ *     # Match between 0 and ∞ whitespaces.
-    \*{3,}  # Match "*" at least 3 times.
-    \ *     # Match between 0 and ∞ whitespaces.
-    $       # Match line end.
-    |       # OR
-    ^       # Match line start.
-    \ *     # Match between 0 and ∞ whitespaces.
-    -{3,}   # Match "-" at least 3 times.
-    \ *     # Match between 0 and ∞ whitespaces.
-    $       # Match line end.
-    |       # OR
-    ^       # Match line start.
-    \ *     # Match between 0 and ∞ whitespaces.
-    _{3,}   # Match "_" at least 3 times.
-    \ *     # Match between 0 and ∞ whitespaces.
-    $       # Match line end.""", re.VERBOSE)
+    ^               # Match line start.
+    \s*             # Match between 0 and ∞ whitespaces.
+    (?:\*|-|_){3,}  # Match either "*", "-" or "_", at least 3 times.
+    \s*             # Match between 0 and ∞ whitespaces.
+    $               # Match line end.""", re.VERBOSE)
 
 REGEX_IMAGE = re.compile(r"""
     (?<!\\)     # Ensure there's no escaping backslash.
     !           # Match "!" once.
     \[          # Match "[" once.
-    \ *         # Match between 0 and ∞ whitespaces.
-    ([^]]+?)    # CAPTURE GROUP (1) | Match between 1 and ∞ characters,
-                # as few times as possible.
-    \ *         # Match between 0 and ∞ whitespaces.
-    ]           # Match "]" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \]          # Match "]" once.
     \(          # Match "(" once.
-    \ *         # Match between 0 and ∞ whitespaces.
-    ([^)]+?)    # CAPTURE GROUP (2) | Match between 1 and ∞ characters,
-                # as few times as possible.
-    \ *         # Match between 0 and ∞ whitespaces.
-    [\"']       # Match either "'" or '"' once.
-    (.+?)       # CAPTURE GROUP (3) | Match between 1 and ∞ characters,
-                # as few times as possible.
-    [\"']       # Match either "'" or '"' once.
-    \ *         # Match between 0 and ∞ whitespaces.
-    \)          # Match ")" once.
-    |           # OR
-    (?<!\\)     # Ensure there's no escaping backslash.
-    !           # Match "!" once.
-    \[          # Match "[" once.
-    \ *         # Match between 0 and ∞ whitespaces.
-    (.+?)       # CAPTURE GROUP (4) | Match between 1 and ∞ characters,
-                # as few times as possible.
-    \ *         # Match between 0 and ∞ whitespaces.
-    ]           # Match "]" once.
-    \(          # Match "(" once.
-    \ *         # Match between 0 and ∞ whitespaces.
-    (.+?)       # CAPTURE GROUP (5) | Match between 1 and ∞ characters,
-                # as few times as possible.
-    \ *         # Match between 0 and ∞ whitespaces.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (3) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (?:         # Open non-capturing group.
+        [\"']   # Match either "'" or '"' once.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (.+?)   # CAPTURE GROUP (4) | Match between 1 and ∞ characters, as few
+                # times as possible.
+        \s*     # Match between 0 and ∞ whitespaces.
+        [\"']   # Match either "'" or '"' once.
+    )?          # Close non-capturing group and match it either 0 or 1 times.
+    \s*         # Match between 0 and ∞ whitespaces.
     \)          # Match ")" once.""", re.VERBOSE)
 
 REGEX_ITALIC = re.compile(r"""
@@ -144,62 +123,50 @@ REGEX_ITALIC = re.compile(r"""
     _               # Match "_" once.""", re.VERBOSE)
 
 REGEX_LINK = re.compile(r"""
-    (?<!\\) # Ensure there's no escaping backslash.
-    \[      # Match "[" once.
-    \ *     # Match between 0 and ∞ whitespaces.
-    (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
-            # times as possible.
-    \ *     # Match between 0 and ∞ whitespaces.
-    ]       # Match "]" once.
-    \(      # Match "(" once.
-    \ *     # Match between 0 and ∞ whitespaces.
-    (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
-            # times as possible.
-    \ *     # Match between 0 and ∞ whitespaces.
-    [\"']   # Match either '"' or "'" once.
-    \ *     # Match between 0 and ∞ whitespaces.
-    (.+?)   # CAPTURE GROUP (3) | Match between 1 and ∞ characters, as few
-            # times as possible.
-    \ *     # Match between 0 and ∞ whitespaces.
-    [\"']   # Match either '"' or "'" once.
-    \ *     # Match between 0 and ∞ whitespaces.
-    \)      # Match ")" once.
-    |       # OR
-    (?<!\\) # Ensure there's no escaping backslash.
-    \[      # Match "[" once.
-    \ *     # Match between 0 and ∞ whitespaces.
-    (.+?)   # CAPTURE GROUP (4) | Match between 1 and ∞ characters, as few
-            # times as possible.
-    \ *     # Match between 0 and ∞ whitespaces.
-    ]       # Match "]" once.
-    \(      # Match "(" once.
-    \ *     # Match between 0 and ∞ whitespaces.
-    (.+?)   # CAPTURE GROUP (5) | Match between 1 and ∞ characters, as few
-            # times as possible.
-    \ *     # Match between 0 and ∞ whitespaces.
-    \)      # Match ")" once.""", re.VERBOSE)
+    (?<!\\)     # Ensure there's no escaping backslash.
+    \[          # Match "[" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \]          # Match "]" once.
+    \(          # Match "(" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (?:         # Open non-capturing group.
+        [\"']   # Match either "'" or '"' once.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (.+?)   # CAPTURE GROUP (3) | Match between 1 and ∞ characters, as few
+                # times as possible.
+        \s*     # Match between 0 and ∞ whitespaces.
+        [\"']   # Match either "'" or '"' once.
+    )?          # Close non-capturing group and match it either 0 or 1 times.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \)          # Match ")" once.""", re.VERBOSE)
 
 REGEX_ORDERED_LIST = re.compile(r"""
     ^       # Match line start.
-    (\ +)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
+    (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
             # times as possible, as either one or zero matches.
     [0-9]+  # Match between 1 and ∞ numbers.
     [.)]    # Match either "." or ")" once.
-    \ +     # Match between 1 and ∞ whitespaces.
+    \s+     # Match between 1 and ∞ whitespaces.
     (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
             # times as possible.
-    \ *     # Match between 0 and ∞ whitespaces.
+    \s*     # Match between 0 and ∞ whitespaces.
     $       # Match line end.""", re.VERBOSE)
 
 REGEX_UNORDERED_LIST = re.compile(r"""
     ^       # Match line start.
-    (\ +)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
+    (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
             # times as possible, as either one or zero matches.
     [-*+]+  # Match between 1 and ∞ "-", "*", or "+".
-    \ +     # Match between 1 and ∞ whitespaces.
+    \s+     # Match between 1 and ∞ whitespaces.
     (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
             # times as possible.
-    \ *     # Match between 0 and ∞ whitespaces.
+    \s*     # Match between 0 and ∞ whitespaces.
     $       # Match line end.""", re.VERBOSE)
 
 # Tags that do not need be enclosed in <p> tags:
@@ -305,11 +272,13 @@ def open_nested_tag(line, tag):
     except TypeError:
         current_level = 1
 
+    content = tag.regex.match(line)[2]
+
     # If current level is greater than last level, add main opening tag along
     # with inner tags to line, and append current level to levels.
     if current_level > last_level:
         new_line = tag.regex.sub(
-            f"{tag.opening_tag}{tag.inner_opening_tag}\\2{tag.inner_closing_tag}", line)
+            f"{tag.opening_tag}{tag.inner_opening_tag}{content}{tag.inner_closing_tag}", line)
         tag.levels.append(current_level)
 
     # If current level is lesser than last level, go through levels, closing
@@ -322,13 +291,13 @@ def open_nested_tag(line, tag):
             else:
                 break
         new_line += tag.regex.sub(
-            f"{tag.inner_opening_tag}\\2{tag.inner_closing_tag}", line)
+            f"{tag.inner_opening_tag}{content}{tag.inner_closing_tag}", line)
 
     # If the current level is the same as the last level, just add inner tags
     # to the line.
     else:
         new_line = tag.regex.sub(
-            f"{tag.inner_opening_tag}\\2{tag.inner_closing_tag}", line)
+            f"{tag.inner_opening_tag}{content}{tag.inner_closing_tag}", line)
     return new_line
 
 
@@ -414,28 +383,30 @@ def convert(string):
         # Add images and links.
         # The order here is important, otherwise images wouldn't work.
         if REGEX_IMAGE.search(line):
-            # Check if image has a title.
-            if REGEX_IMAGE.search(line)[3]:
-                line = REGEX_IMAGE.sub(
-                    "<img src=\"\\2\\5\" alt=\"\\1\\4\" title=\"\\3\">", line)
-            else:
-                line = REGEX_IMAGE.sub(
-                    "<img src=\"\\2\\5\" alt=\"\\1\\4\">", line)
+            match = REGEX_LINK.search(line)
+            alt_text, url, title = match.groups()
+
+            line = REGEX_IMAGE.sub(
+                f'<img src="{url}" alt="{alt_text}"'
+                + (f' title="{title}"' if title else '')
+                + '>', line)
+
         if REGEX_LINK.search(line):
-            # Check if link has a title.
-            if REGEX_LINK.search(line)[3]:
-                line = REGEX_LINK.sub(
-                    "<a href=\"\\2\\5\" title=\"\\3\">\\1\\4</a>", line)
-            else:
-                line = REGEX_LINK.sub("<a href=\"\\2\\5\">\\1\\4</a>", line)
+            match = REGEX_LINK.search(line)
+            alt_text, url, title = match.groups()
+
+            line = REGEX_LINK.sub(
+                f'<a href="{url}"'
+                + (f' title="{title}"' if title else '')
+                + f'>{alt_text}</a>', line)
 
         # Add headings.
         if REGEX_HEADING.search(line):
-            level = len(REGEX_HEADING.search(line.lstrip())[3])
-            line = REGEX_HEADING.sub(f"\\1<h{level}>\\4</h{level}>\\5", line)
+            level = len(REGEX_HEADING.search(line)[2])
+            line = REGEX_HEADING.sub(f"\\1<h{level}>\\3</h{level}>\\4", line)
 
         # Line is an unordered list.
-        if REGEX_UNORDERED_LIST.search(line.lstrip()):
+        if REGEX_UNORDERED_LIST.search(line):
             new_line = open_nested_tag(line, TAG_UNORDERED_LIST)
 
         # Line is not an unordered list, but there are still open <ul> tags.
