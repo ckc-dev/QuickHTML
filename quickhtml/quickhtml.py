@@ -3,15 +3,13 @@
 import re
 
 REGEX_BLOCKQUOTE = re.compile(r"""
-    ^           # Match line start.
     \s*         # Match between 0 and ∞ whitespaces.
     (>+)        # CAPTURE GROUP (1) | Match between 1 and ∞ ">".
     \s*         # Match between 0 and ∞ whitespaces.
     ([^>].*?)   # CAPTURE GROUP (2) | Match first character that is not ">",
                 # then match between 0 and ∞ characters, as few times as
                 # possible.
-    \s*         # Match between 0 and ∞ whitespaces.
-    $           # Match line end.""", re.VERBOSE)
+    \s*         # Match between 0 and ∞ whitespaces.""", re.VERBOSE)
 
 REGEX_BOLD = re.compile(r"""
     (?<!\\)         # Ensure there's no escaping backslash.
@@ -147,7 +145,6 @@ REGEX_LINK = re.compile(r"""
     \)          # Match ")" once.""", re.VERBOSE)
 
 REGEX_ORDERED_LIST = re.compile(r"""
-    ^       # Match line start.
     (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
             # times as possible, as either one or zero matches.
     [0-9]+  # Match between 1 and ∞ numbers.
@@ -155,19 +152,16 @@ REGEX_ORDERED_LIST = re.compile(r"""
     \s+     # Match between 1 and ∞ whitespaces.
     (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
             # times as possible.
-    \s*     # Match between 0 and ∞ whitespaces.
-    $       # Match line end.""", re.VERBOSE)
+    \s*     # Match between 0 and ∞ whitespaces.""", re.VERBOSE)
 
 REGEX_UNORDERED_LIST = re.compile(r"""
-    ^       # Match line start.
     (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
             # times as possible, as either one or zero matches.
     [-*+]+  # Match between 1 and ∞ "-", "*", or "+".
     \s+     # Match between 1 and ∞ whitespaces.
     (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
             # times as possible.
-    \s*     # Match between 0 and ∞ whitespaces.
-    $       # Match line end.""", re.VERBOSE)
+    \s*     # Match between 0 and ∞ whitespaces.""", re.VERBOSE)
 
 # Tags that do not need be enclosed in <p> tags:
 INDEPENDENT_TAGS = (
@@ -178,145 +172,29 @@ INDEPENDENT_TAGS = (
     "<blockquote",  # Blockquotes.
 )
 
-
-# Class for nested tags, such as <ol>, <ul>, and <blockquote>.
-class NestedTag:
-    """
-    An HTML tag that may have multiple levels of nesting.
-
-    E.g.:
-    <ul>
-        <ul>
-            <ul>
-                <li>This is a list item.</li>
-            </ul>
-        </ul>
-    </ul>
-    """
-
-    def __init__(self, regex, opening_tag, inner_opening_tag):
-        """
-        Initialize a new nested tag.
-
-        Args:
-            regex (re.Pattern): RegEx to use. E.g.: re.compile(r"^.*$").
-            opening_tag (str): Main, outer opening tag. E.g.: "<ul>".
-            inner_opening_tag (str): Secondary, inner opening tag. E.g.: "<li>".
-        """
-        self.levels = []
-        self.regex = regex
-        self.opening_tag = opening_tag
-        self.closing_tag = opening_tag.replace("<", "</")
-        self.inner_opening_tag = inner_opening_tag
-        self.inner_closing_tag = inner_opening_tag.replace("<", "</")
-
-    def open(self, line):
-        """
-        Open one or more tags, converting Markdown to HTML.
-
-        Conversion is based on the level of the last consecutive element,
-        opening a new tag if current level is greater than the last, and
-        closing the last tag if the current level is lesser than the last.
-
-        E.g.:
-            > Quote Level 1
-            Becomes:
-
-            <blockquote>
-                <p>Quote Level 1</p>
-
-            > Quote Level 1
-            >> Quote Level 2
-            > Quote Level 1
-            Becomes (after function runs on the three lines):
-
-            <blockquote>
-                <p>Quote Level 1</p>
-                <blockquote>
-                    <p>Quote Level 2</p>
-                </blockquote>
-                <p>Quote Level 1</p>
-
-            > Quote Level 1
-            >> Quote Level 2
-            >>> Quote Level 3
-            >>>> Quote Level 4
-            Becomes (after function runs on the four lines):
-
-            <blockquote>
-                <p>Quote Level 1</p>
-                <blockquote>
-                    <p>Quote Level 2</p>
-                    <blockquote>
-                        <p>Quote Level 3</p>
-                        <blockquote>
-                            <p>Quote Level 4</p>
-
-        Args:
-            line (str): Line to convert. E.g.: "> Quote Level 1".
-
-        Returns:
-            new_line (str) : Converted string.
-        """
-        new_line = ""
-
-        try:
-            last_level = self.levels[-1]
-        except IndexError:
-            last_level = 0
-        try:
-            # 1 is added to ensure current level is never less than 1.
-            current_level = len(self.regex.match(line)[1]) + 1
-        except TypeError:
-            current_level = 1
-
-        content = self.regex.match(line)[2]
-
-        # If current level is greater than last level, add main opening tag
-        # along with inner tags to line, and append current level to levels.
-        if current_level > last_level:
-            new_line = self.regex.sub(
-                f"{self.opening_tag}{self.inner_opening_tag}{content}{self.inner_closing_tag}", line)
-            self.levels.append(current_level)
-
-        # If current level is lesser than last level, go through levels,
-        # closing tags until a level is not greater than current level.
-        elif current_level < last_level:
-            for level in reversed(self.levels):
-                if level > current_level:
-                    new_line += self.closing_tag
-                    self.levels.remove(level)
-                else:
-                    break
-            new_line += self.regex.sub(
-                f"{self.inner_opening_tag}{content}{self.inner_closing_tag}", line)
-
-        # If the current level is the same as the last level, just add inner
-        # tags to the line.
-        else:
-            new_line = self.regex.sub(
-                f"{self.inner_opening_tag}{content}{self.inner_closing_tag}", line)
-        return new_line
-
-    def close(self):
-        """
-        Close one or more tags.
-
-        Returns a line with required amount of closing tags based on level of
-        the last element using the same tag, then clears tag level.
-
-        E.g.:
-                        </blockquote>
-                    </blockquote>
-                </blockquote>
-            </blockquote>
-
-        Returns:
-            new_line (str): Closing tags.
-        """
-        new_line = len(self.levels) * self.closing_tag
-        self.levels[:] = []
-        return new_line
+NESTED_TAGS = (
+    {
+        "regex": REGEX_BLOCKQUOTE,
+        "outer_opening_tag": "<blockquote>",
+        "outer_closing_tag": "</blockquote>",
+        "inner_opening_tag": "<p>",
+        "inner_closing_tag": "</p>",
+    },
+    {
+        "regex": REGEX_ORDERED_LIST,
+        "outer_opening_tag": "<ol>",
+        "outer_closing_tag": "</ol>",
+        "inner_opening_tag": "<li>",
+        "inner_closing_tag": "</li>",
+    },
+    {
+        "regex": REGEX_UNORDERED_LIST,
+        "outer_opening_tag": "<ul>",
+        "outer_closing_tag": "</ul>",
+        "inner_opening_tag": "<li>",
+        "inner_closing_tag": "</li>",
+    }
+)
 
 
 def is_paragraph(line):
@@ -333,6 +211,194 @@ def is_paragraph(line):
 
     # A paragraph can start with a "<br>", but not just be a "<br>".
     return line not in ("", "<br>") and not line.startswith(INDEPENDENT_TAGS)
+
+
+def convert_nested_tag(line, cur_tag, open_tags):
+    """
+    Convert one or more nested tags in a line.
+
+    Conversion is based on the level of the last tag open, opening a new tag if
+    the current level is greater than the last, and closing the last tag if the
+    current level is lesser than the last.
+
+    E.g.:
+        > Quote Level 1
+        Becomes:
+        <blockquote>
+            <p>Quote Level 1</p>
+
+        > Quote Level 1
+        >> Quote Level 2
+        > Quote Level 1
+        Becomes (after function runs on the three lines):
+        <blockquote>
+            <p>Quote Level 1</p>
+            <blockquote>
+                <p>Quote Level 2</p>
+            </blockquote>
+            <p>Quote Level 1</p>
+
+        > Quote Level 1
+        >> Quote Level 2
+        >>> Quote Level 3
+        >>>> Quote Level 4
+        Becomes (after function runs on the four lines):
+        <blockquote>
+            <p>Quote Level 1</p>
+            <blockquote>
+                <p>Quote Level 2</p>
+                <blockquote>
+                    <p>Quote Level 3</p>
+                    <blockquote>
+                        <p>Quote Level 4</p>
+
+    Args:
+        line (str): Line to convert.
+        cur_tag (dict[str, Any]): Dictionary containing data about type of tag
+            used in conversion.
+        open_tags (list[tuple[dict[str, Any], int]]): A list of tuples which
+            represent tags left open, where each tuple contains a dictionary
+            representing a tag, and its respective level.
+    Returns:
+        new_line (str) : Converted line.
+    """
+    def convert_inline(string):
+        """
+        Recursively convert nested tags present in a string.
+
+        This function should only be used to convert nested tags present in the
+        content of another nested tag. That is, it is only useful for nested
+        tags which are on the same line as an initially matched main tag, since
+        it does not account for levels.
+
+        E.g.:
+            "1. - Unordered list inside an ordered list."
+            Becomes:
+            <ol>
+                <li>
+                    <ul>
+                        <li>Unordered list inside an ordered list.</li>
+                    </ul>
+                </li>
+            </ol>
+
+        Args:
+            string (str): String to convert.
+
+        Returns:
+            string: Converted string.
+        """
+        for tag in NESTED_TAGS:
+            match = tag["regex"].fullmatch(string)
+            if match:
+                content = match[2]
+                string = "".join((
+                    tag["outer_opening_tag"],
+                    tag["inner_opening_tag"],
+                    convert_inline(content.strip()),
+                    tag["inner_closing_tag"],
+                    tag["outer_closing_tag"]
+                ))
+        return string
+
+    new_line = ""
+    match = cur_tag["regex"].fullmatch(line)
+
+    try:
+        last_tag = open_tags[-1][0]
+        last_tag_level = open_tags[-1][1]
+    except IndexError:
+        last_tag_level = 0
+    try:
+        cur_tag_level = max(1, len(match[1]))
+    except TypeError:
+        cur_tag_level = 1
+
+    content = convert_inline(match[2])
+
+    # If current level is greater than last level, open a new tag, then append
+    # tag and level to the list of open tags.
+    if cur_tag_level > last_tag_level:
+        new_line = "".join((
+            cur_tag["outer_opening_tag"],
+            cur_tag["inner_opening_tag"],
+            content,
+            cur_tag["inner_closing_tag"]
+        ))
+        open_tags.append((cur_tag, cur_tag_level))
+
+    # If current level is lesser than last level:
+    elif cur_tag_level < last_tag_level:
+        # If none of the open tags have a level equal to or lesser than current
+        # level, close the last tag, remove it from the list of open tags, open
+        # a new tag, and add it to the list of open tags. This is checked
+        # mainly to account for edge cases.
+        if not any(open_tag[1] <= cur_tag_level for open_tag in open_tags):
+            new_line = "".join((
+                last_tag["outer_closing_tag"],
+                cur_tag["outer_opening_tag"],
+                cur_tag["inner_opening_tag"],
+                content,
+                cur_tag["inner_closing_tag"]
+            ))
+            open_tags.remove(open_tags[-1])
+            open_tags.append((cur_tag, cur_tag_level))
+        else:
+            # Go through open tags, closing them until a tag's level is equal
+            # to or lesser than current level.
+            for open_tag in reversed(open_tags):
+                tag, level = open_tag
+                if level > cur_tag_level:
+                    new_line += tag["outer_closing_tag"]
+                    open_tags.remove(open_tag)
+                else:
+                    # If this tag is the same type as current tag, open inner
+                    # tags only.
+                    if tag == cur_tag:
+                        new_line += "".join((
+                            cur_tag["inner_opening_tag"],
+                            content,
+                            cur_tag["inner_closing_tag"]
+                        ))
+
+                    # If not, then close it, remove it from the list of open
+                    # tags, open a new tag and add it to the list of open tags.
+                    else:
+                        new_line += "".join((
+                            tag["outer_closing_tag"],
+                            cur_tag["outer_opening_tag"],
+                            cur_tag["inner_opening_tag"],
+                            content,
+                            cur_tag["inner_closing_tag"]
+                        ))
+                        open_tags.remove(open_tag)
+                        open_tags.append((cur_tag, cur_tag_level))
+                    break
+
+    # If current level is the same as last level:
+    else:
+        # If last tag is the same type as current tag, open inner tags only.
+        if last_tag == cur_tag:
+            new_line = "".join((
+                cur_tag["inner_opening_tag"],
+                content,
+                cur_tag["inner_closing_tag"]
+            ))
+
+        # If not, then close it, remove it from the list of open tags, open a
+        # new tag, and add it to the list of open tags.
+        else:
+            new_line = "".join((
+                last_tag["outer_closing_tag"],
+                cur_tag["outer_opening_tag"],
+                cur_tag["inner_opening_tag"],
+                content,
+                cur_tag["inner_closing_tag"]
+            ))
+            open_tags.remove(open_tags[-1])
+            open_tags.append((cur_tag, cur_tag_level))
+
+    return new_line
 
 
 def convert(string):
@@ -352,9 +418,7 @@ def convert(string):
     while string.splitlines()[-1] != "":
         string += "\n"
 
-    TAG_BLOCKQUOTE = NestedTag(REGEX_BLOCKQUOTE, "<blockquote>", "<p>")
-    TAG_ORDERED_LIST = NestedTag(REGEX_ORDERED_LIST, "<ol>", "<li>")
-    TAG_UNORDERED_LIST = NestedTag(REGEX_UNORDERED_LIST, "<ul>", "<li>")
+    open_tags = []
     new_string = ""
     open_paragraph = False
     add_line_break = False
@@ -379,16 +443,13 @@ def convert(string):
         if REGEX_IMAGE.search(line):
             match = REGEX_LINK.search(line)
             alt_text, url, title = match.groups()
-
             line = REGEX_IMAGE.sub(
                 f'<img src="{url}" alt="{alt_text}"'
                 + (f' title="{title}"' if title else '')
                 + '>', line)
-
         if REGEX_LINK.search(line):
             match = REGEX_LINK.search(line)
             alt_text, url, title = match.groups()
-
             line = REGEX_LINK.sub(
                 f'<a href="{url}"'
                 + (f' title="{title}"' if title else '')
@@ -399,34 +460,19 @@ def convert(string):
             level = len(REGEX_HEADING.search(line)[2])
             line = REGEX_HEADING.sub(f"\\1<h{level}>\\3</h{level}>\\4", line)
 
-        # Line is an unordered list.
-        if REGEX_UNORDERED_LIST.search(line):
-            new_line = TAG_UNORDERED_LIST.open(line)
+        # Check if line contains nested tags, if so, open tags.
+        if any(tag["regex"].fullmatch(line) for tag in NESTED_TAGS):
+            for tag in NESTED_TAGS:
+                if tag["regex"].fullmatch(line):
+                    new_line = convert_nested_tag(line, tag, open_tags)
 
-        # Line is not an unordered list, but there are still open <ul> tags.
-        elif len(TAG_UNORDERED_LIST.levels) > 0:
-            new_line = (TAG_UNORDERED_LIST.close()
-                        + (f"<p>{line}</p>"if is_paragraph(line) else line))
+        # If not, check if there are open tags, if so, close them.
+        elif open_tags:
+            for tag in reversed(open_tags):
+                new_line += tag[0]["outer_closing_tag"]
+                open_tags.remove(tag)
 
-        # Line is an ordered list.
-        elif REGEX_ORDERED_LIST.search(line):
-            new_line = TAG_ORDERED_LIST.open(line)
-
-        # Line is not an ordered list, but there are still open <ol> tags.
-        elif len(TAG_ORDERED_LIST.levels) > 0:
-            new_line = (TAG_ORDERED_LIST.close()
-                        + (f"<p>{line}</p>"if is_paragraph(line) else line))
-
-        # Line is a blockquote.
-        elif REGEX_BLOCKQUOTE.search(line):
-            new_line = TAG_BLOCKQUOTE.open(line)
-
-        # Line is not a blockquote, but there are still open <blockquote> tags.
-        elif len(TAG_BLOCKQUOTE.levels) > 0:
-            new_line = (TAG_BLOCKQUOTE.close()
-                        + (f"<p>{line}</p>"if is_paragraph(line) else line))
-
-        # Line is a paragraph.
+        # If not, check if line is a paragraph, if so, open a paragraph.
         elif is_paragraph(line):
             if not open_paragraph:
                 open_paragraph = True
@@ -434,7 +480,7 @@ def convert(string):
             else:
                 new_line = line
 
-        # Nothing above applies.
+        # If not, just add the line as it is.
         else:
             new_line += line
 
