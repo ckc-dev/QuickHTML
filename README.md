@@ -1,22 +1,33 @@
 # QuickHTML
-## About
-This is a simple Markdown to HTML preprocessor. It does not require any third-party modules, however, at the moment it also does not have some functionality other preprocessors have, such as mixing nested tags *(see [Mixing nested tags](#mixing-nested-tags))*.
 
-## Installation
+A simple Markdown to HTML preprocessor that does not require any third-party modules.
+
+Quickly gererate HTML from Markdown, using python.
+
+## Technologies used
+
+- Python
+- RegEx
+
+# Installation
+
 QuickHTML is a Python module, if Python is not already installed in your system, you can get the latest version [here](https://python.org/downloads/) or using a package manager. pip should be installed with Python by default, if not, you can get it [here](https://pip.pypa.io/en/stable/installing/).
 
 QuickHTML can then be installed using pip, by running `pip install quickhtml` on the command line.
 
-## Usage
+# Usage
+
 To see how to use QuickHTML directly from the terminal, run `python -m quickhtml -h`.
 
 To import QuickHTML in Python files, use:
+
 ```
 >>> import quickhtml
 >>> ...
 ```
 
 The `convert()` function accepts a string, and returns it formatted as HTML:
+
 ```
 >>> string = "# This is a level 1 heading."
 >>> quickhtml.convert(string)
@@ -25,6 +36,7 @@ The `convert()` function accepts a string, and returns it formatted as HTML:
 ```
 
 The `convert_file()` function accepts a file path, and returns its contents formatted as HTML:
+
 ```
 >>> file = "../my_folder/my_markdown_documents/example_document.md"
 >>> quickhtml.convert_file(file)
@@ -32,9 +44,12 @@ The `convert_file()` function accepts a file path, and returns its contents form
 >>> ...
 ```
 
-## Supported syntax
-### Headings
+# Supported syntax
+
+## Headings
+
 To create a heading, add a number of pound (`#`) signs before a word or phrase. The number of signs corresponds to the heading level, up to six levels. For example, to create a level three heading (`<h3>`), use three pound signs (`### This is a level three heading.`).
+
 <table>
     <thead>
         <tr>
@@ -77,10 +92,12 @@ To create a heading, add a number of pound (`#`) signs before a word or phrase. 
     </tbody>
 </table>
 
-*The alternate heading syntax, which uses the equals (`=`) and minus (`-`) signs is not supported at the moment.*
+_The alternate heading syntax, which uses the equals (`=`) and minus (`-`) signs is not supported at the moment._
 
-### Paragraphs
+## Paragraphs
+
 Use a blank line to separate paragraphs.
+
 <table>
     <thead>
         <tr>
@@ -103,9 +120,10 @@ Use a blank line to separate paragraphs.
     </tbody>
 </table>
 
+## Line breaks
 
-### Line breaks
 End a line with two or more spaces to create a line break (`<br>`).
+
 <table>
     <thead>
         <tr>
@@ -123,10 +141,14 @@ End a line with two or more spaces to create a line break (`<br>`).
     </tbody>
 </table>
 
-### Emphasis
+## Emphasis
+
 Emphasis can be added by making text bold, italic, or both.
-#### Bold
+
+### Bold
+
 To make text bold, add two asterisks (`**`) or underscores (`__`) before and after a word, phrase, or letter.
+
 <table>
     <thead>
         <tr>
@@ -154,8 +176,10 @@ To make text bold, add two asterisks (`**`) or underscores (`__`) before and aft
     </tbody>
 </table>
 
-#### Italic
-To make text bold, add an asterisk (`*`) or underscore (`_`) before and after a word, phrase, or letter.
+### Italic
+
+To make text italic, add an asterisk (`*`) or underscore (`_`) before and after a word, phrase, or letter.
+
 <table>
     <thead>
         <tr>
@@ -183,8 +207,10 @@ To make text bold, add an asterisk (`*`) or underscore (`_`) before and after a 
     </tbody>
 </table>
 
-#### Bold and italic
+### Bold and italic
+
 To make text bold and italic, add three asterisks (`***`) or underscores (`___`) before and after a word, phrase, or letter.
+
 <table>
     <thead>
         <tr>
@@ -212,8 +238,10 @@ To make text bold and italic, add three asterisks (`***`) or underscores (`___`)
     </tbody>
 </table>
 
-### Blockquotes
+## Blockquotes
+
 To create a blockquote, add a number of greater than (`>`) signs before a paragraph. To nest blockquotes, add a number of signs that is greater or lesser than the last one. For example, a level 1 blockquote (`>`) followed by a level 2 blockquote (`>>`).
+
 <table>
     <thead>
         <tr>
@@ -251,11 +279,14 @@ To create a blockquote, add a number of greater than (`>`) signs before a paragr
     </tbody>
 </table>
 
-*At the moment, multiline items are not supported inside blockquotes. This means each line is a new item.*
+_At the moment, multiline items, such as multiline paragraphs, are not supported inside blockquotes. This means each line is a new item._
 
-### Lists
+## Lists
+
 Items can be organized into ordered and unordered lists.
-#### Ordered lists
+
+### Ordered lists
+
 To create an ordered list, add a number, followed by a period (`.`) or closing parenthesis (`)`), followed by a space before a paragraph. The numbers do not have to be in numerical order. To nest ordered lists, add a number of spaces before the number that is greater or lesser than the last number of spaces. For example, a level 1 ordered list (`1. `) followed by a level 2 ordered list. (<code> 1. </code>)
 
 <table>
@@ -300,7 +331,8 @@ To create an ordered list, add a number, followed by a period (`.`) or closing p
     </tbody>
 </table>
 
-#### Unordered lists
+### Unordered lists
+
 To create an unordered list, add a dash (`-`), asterisk (`*`), or plus (`+`) sign, followed by a space before a paragraph. To nest unordered lists, add a number of spaces before the dash (`-`), asterisk (`*`), or plus (`+`) sign that is greater or lesser than the last number of spaces. For example, a level 1 unordered list (`- `) followed by a level 2 unordered list. (<code> - </code>)
 
 <table>
@@ -335,10 +367,12 @@ To create an unordered list, add a dash (`-`), asterisk (`*`), or plus (`+`) sig
     </tbody>
 </table>
 
-*At the moment, multiline items are not supported inside lists. This means each line is a new item.*
+_At the moment, multiline items, such as multiline paragraphs, are not supported inside lists. This means each line is a new item._
 
-### Code
+## Code
+
 To denote text as code, add backticks (<code>`</code>) before and after a word or phrase.
+
 <table>
     <thead>
         <tr>
@@ -361,8 +395,10 @@ To denote text as code, add backticks (<code>`</code>) before and after a word o
     </tbody>
 </table>
 
-#### Escaping backticks
+### Escaping backticks
+
 If the word or phrase you want to denote as code includes one or more backticks, you can escape it by using double backticks (<code>``</code>) instead.
+
 <table>
     <thead>
         <tr>
@@ -390,10 +426,12 @@ If the word or phrase you want to denote as code includes one or more backticks,
     </tbody>
 </table>
 
-*Backticks can also be escaped using a backslash (see [escaping characters](#escaping-characters))*.
+_Backticks can also be escaped using a backslash (see [escaping characters](#escaping-characters))_.
 
-### Horizontal Rules
+## Horizontal Rules
+
 To create a horizontal rule, add three or more asterisks (`***`), minus (`---`) signs, or underscores (`___`) by themselves on a line.
+
 <table>
     <thead>
         <tr>
@@ -436,8 +474,10 @@ To create a horizontal rule, add three or more asterisks (`***`), minus (`---`) 
     </tbody>
 </table>
 
-### Links
+## Links
+
 To create a link, enclose the link name in square brackets (`[]`), followed by the URL enclosed in parentheses (`()`).
+
 <table>
     <thead>
         <tr>
@@ -460,8 +500,10 @@ To create a link, enclose the link name in square brackets (`[]`), followed by t
     </tbody>
 </table>
 
-#### Adding titles to links
+### Adding titles to links
+
 A title can optionally be added to a link, it will appear as a tooltip when the link is hovered. To add a title, enclose it in either single (`'`) or double (`"`) quotes after the URL.
+
 <table>
     <thead>
         <tr>
@@ -484,8 +526,10 @@ A title can optionally be added to a link, it will appear as a tooltip when the 
     </tbody>
 </table>
 
-### Images
+## Images
+
 To add an image, use an exclamation mark (`!`), followed by the image `alt` text enclosed in square brackets (`[]`), followed by the image's path or URL enclosed in parentheses (`()`). Titles can be optionally added to images, to add a title, enclose it in either single (`'`) or double (`"`) quotes after the URL.
+
 <table>
     <thead>
         <tr>
@@ -508,8 +552,10 @@ To add an image, use an exclamation mark (`!`), followed by the image `alt` text
     </tbody>
 </table>
 
-#### Adding links to images
+### Adding links to images
+
 To add a link to an image, enclose the Markdown for the image in square brackets (`[]`), then follow with the link enclosed in parentheses (`()`).
+
 <table>
     <thead>
         <tr>
@@ -532,8 +578,10 @@ To add a link to an image, enclose the Markdown for the image in square brackets
     </tbody>
 </table>
 
-### Escaping characters
+## Escaping characters
+
 Add a backslash (`\`) before a character to escape it, this is often used to display literal characters that would otherwise be used in Markdown syntax.
+
 <table>
     <thead>
         <tr>
@@ -556,15 +604,6 @@ Add a backslash (`\`) before a character to escape it, this is often used to dis
     </tbody>
 </table>
 
-#### Escape sequences
-You can use [escape sequences](https://docs.python.org/reference/lexical_analysis.html#literals) when passing strings directly to the `convert()` function.
+### Escape sequences
 
-### Mixing nested tags
-Mixing nested tags is not supported at the moment, this means you can't mix lists and blockquotes.
-> This
-> 1. is
-> 2. - not
-> 3. - > supported
-> 4. - > 1. at
-> 5. - > 2. - the
-> 6. - > 3. - > moment.
+You can use [escape sequences](https://docs.python.org/reference/lexical_analysis.html#literals) when passing strings directly to the `convert()` function.
