@@ -170,6 +170,8 @@ INDEPENDENT_TAGS = (
     "<img",         # Images.
     "<code",        # Code.
     "<blockquote",  # Blockquotes.
+    "<ol",          # Ordered lists.
+    "<ul",          # Ordered lists.
 )
 
 NESTED_TAGS = (
@@ -179,6 +181,7 @@ NESTED_TAGS = (
         "outer_closing_tag": "</blockquote>",
         "inner_opening_tag": "<p>",
         "inner_closing_tag": "</p>",
+        "inner_ignore_tags": INDEPENDENT_TAGS
     },
     {
         "regex": REGEX_ORDERED_LIST,
@@ -186,6 +189,7 @@ NESTED_TAGS = (
         "outer_closing_tag": "</ol>",
         "inner_opening_tag": "<li>",
         "inner_closing_tag": "</li>",
+        "inner_ignore_tags": None
     },
     {
         "regex": REGEX_UNORDERED_LIST,
@@ -193,6 +197,7 @@ NESTED_TAGS = (
         "outer_closing_tag": "</ul>",
         "inner_opening_tag": "<li>",
         "inner_closing_tag": "</li>",
+        "inner_ignore_tags": None
     }
 )
 
@@ -262,6 +267,30 @@ def convert_nested_tag(line, cur_tag, open_tags):
     Returns:
         new_line (str) : Converted line.
     """
+    def inner_tags(string, tag):
+        """
+        Add opening and closing inner tags to a string, if required.
+
+        Inner tags will be added to string only if the string does not start
+        with a tag ignored by this tag. For example, lists within blockquotes
+        should not be surrounded by paragraph tags, so they are ignored.
+
+        Args:
+            string (str): String to add tags to.
+            tag (tuple[dict[str, Any]]): A dictionary representing a tag.
+
+        Returns:
+            string: Resulting string.
+        """
+        ignored = tag["inner_ignore_tags"]
+        if ignored and any(string.startswith(i) for i in ignored):
+            return string
+        return "".join((
+            tag["inner_opening_tag"],
+            string,
+            tag["inner_closing_tag"]
+        ))
+
     def convert_inline(string):
         """
         Recursively convert nested tags present in a string.
@@ -294,9 +323,7 @@ def convert_nested_tag(line, cur_tag, open_tags):
                 content = match[2]
                 string = "".join((
                     tag["outer_opening_tag"],
-                    tag["inner_opening_tag"],
-                    convert_inline(content.strip()),
-                    tag["inner_closing_tag"],
+                    inner_tags(convert_inline(content.strip()), tag),
                     tag["outer_closing_tag"]
                 ))
         return string
@@ -321,9 +348,7 @@ def convert_nested_tag(line, cur_tag, open_tags):
     if cur_tag_level > last_tag_level:
         new_line = "".join((
             cur_tag["outer_opening_tag"],
-            cur_tag["inner_opening_tag"],
-            content,
-            cur_tag["inner_closing_tag"]
+            inner_tags(content, cur_tag)
         ))
         open_tags.append((cur_tag, cur_tag_level))
 
@@ -337,9 +362,7 @@ def convert_nested_tag(line, cur_tag, open_tags):
             new_line = "".join((
                 last_tag["outer_closing_tag"],
                 cur_tag["outer_opening_tag"],
-                cur_tag["inner_opening_tag"],
-                content,
-                cur_tag["inner_closing_tag"]
+                inner_tags(content, cur_tag)
             ))
             open_tags.remove(open_tags[-1])
             open_tags.append((cur_tag, cur_tag_level))
@@ -355,11 +378,7 @@ def convert_nested_tag(line, cur_tag, open_tags):
                     # If this tag is the same type as current tag, open inner
                     # tags only.
                     if tag == cur_tag:
-                        new_line += "".join((
-                            cur_tag["inner_opening_tag"],
-                            content,
-                            cur_tag["inner_closing_tag"]
-                        ))
+                        new_line += inner_tags(content, cur_tag)
 
                     # If not, then close it, remove it from the list of open
                     # tags, open a new tag and add it to the list of open tags.
@@ -367,9 +386,7 @@ def convert_nested_tag(line, cur_tag, open_tags):
                         new_line += "".join((
                             tag["outer_closing_tag"],
                             cur_tag["outer_opening_tag"],
-                            cur_tag["inner_opening_tag"],
-                            content,
-                            cur_tag["inner_closing_tag"]
+                            inner_tags(content, cur_tag)
                         ))
                         open_tags.remove(open_tag)
                         open_tags.append((cur_tag, cur_tag_level))
@@ -379,11 +396,7 @@ def convert_nested_tag(line, cur_tag, open_tags):
     else:
         # If last tag is the same type as current tag, open inner tags only.
         if last_tag == cur_tag:
-            new_line = "".join((
-                cur_tag["inner_opening_tag"],
-                content,
-                cur_tag["inner_closing_tag"]
-            ))
+            new_line = inner_tags(content, cur_tag)
 
         # If not, then close it, remove it from the list of open tags, open a
         # new tag, and add it to the list of open tags.
@@ -391,9 +404,7 @@ def convert_nested_tag(line, cur_tag, open_tags):
             new_line = "".join((
                 last_tag["outer_closing_tag"],
                 cur_tag["outer_opening_tag"],
-                cur_tag["inner_opening_tag"],
-                content,
-                cur_tag["inner_closing_tag"]
+                inner_tags(content, cur_tag)
             ))
             open_tags.remove(open_tags[-1])
             open_tags.append((cur_tag, cur_tag_level))

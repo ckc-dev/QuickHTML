@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="quickhtml",
-    version="2.0.0",
+    version="2.0.1",
     author="ckc-dev",
     author_email="ckc-dev@pm.me",
-    description="A simple Markdown to HTML preprocessor.",
+    description="A simple Markdown to HTML preprocessor that doesn't require third-party modules.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ckc-dev/QuickHTML",
