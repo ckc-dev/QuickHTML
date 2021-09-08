@@ -61,18 +61,16 @@ class BlockquoteTest(unittest.TestCase):
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-
+        >>>>>This is a level 1 blockquote.
+        >>>>>This is a level 1 blockquote.
+        >>>>>This is a level 1 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >>>>>This is a level 1 blockquote.
-        >>>>>This is a level 1 blockquote.
-        >>>>>This is a level 1 blockquote.
-        """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote>")
+>This is a level 1 blockquote.
+>>This is a level 2 blockquote.
+>>>This is a level 3 blockquote.
+        """), "<blockquote><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
         self.assertEqual(CONVERT("""
         >This is a level 1 blockquote.
@@ -86,7 +84,7 @@ class BlockquoteTest(unittest.TestCase):
         >>>>>>>>>>>This is a level 3 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
-        self.assertEqual(CONVERT("""\
+        self.assertEqual(CONVERT("""
             >This is a level 1 blockquote.
             >This is a level 1 blockquote.
             >>>>>>>>>>>>>>>>>>>>This is a level 2 blockquote.
@@ -126,6 +124,21 @@ class BlockquoteTest(unittest.TestCase):
         >>>>This is a level 4 blockquote.
         >This is a level 1 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p><blockquote><p>This is a level 4 blockquote.</p></blockquote></blockquote></blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+        >>>This is a level 1 blockquote.
+        >>This is a level 1 blockquote.
+        >This is a level 1 blockquote.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+        >>>This is a level 1 blockquote.
+        >>This is a level 1 blockquote.
+        >This is a level 1 blockquote.
+        >This is a level 1 blockquote.
+        >>This is a level 2 blockquote.
+        >>>This is a level 3 blockquote.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
     def test_should_not_be_affected(self):
         self.assertEqual(CONVERT("This should not be affected. >"),
@@ -856,12 +869,10 @@ class OrderedListTest(unittest.TestCase):
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li></ol>")
 
         self.assertEqual(CONVERT("""
-
-        1024. This is a level 1 ordered list item.
-        1. This is a level 1 ordered list item.
-        256. This is a level 1 ordered list item.
-
-        """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li></ol>")
+1. This is a level 1 ordered list item.
+ 2. This is a level 2 ordered list item.
+  3. This is a level 3 ordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
 
         self.assertEqual(CONVERT("""
         1. This is a level 1 ordered list item.
@@ -924,6 +935,21 @@ class OrderedListTest(unittest.TestCase):
            1. This is a level 4 ordered list item.
         4. This is a level 1 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li><ol><li>This is a level 4 ordered list item.</li></ol></ol></ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+          1. This is a level 1 list item.
+         1. This is a level 1 list item.
+        1. This is a level 1 list item.
+        """), "<ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+          1. This is a level 1 list item.
+         1. This is a level 1 list item.
+        1. This is a level 1 list item.
+        1. This is a level 1 list item.
+         2. This is a level 2 list item.
+          3. This is a level 3 list item.
+        """), "<ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li><li>This is a level 1 list item.</li><ol><li>This is a level 2 list item.</li><ol><li>This is a level 3 list item.</li></ol></ol></ol>")
 
     def test_should_not_be_affected(self):
         self.assertEqual(CONVERT("1This should not be affected."),
@@ -1016,18 +1042,16 @@ class UnorderedListTest(unittest.TestCase):
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul>")
 
         self.assertEqual(CONVERT("""
-
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-
-        """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul>")
-
-        self.assertEqual(CONVERT("""
         ----- This is a level 1 unordered list item item.
         ----- This is a level 1 unordered list item item.
         ----- This is a level 1 unordered list item item.
         """), "<ul><li>This is a level 1 unordered list item item.</li><li>This is a level 1 unordered list item item.</li><li>This is a level 1 unordered list item item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+ - This is a level 2 unordered list item.
+  - This is a level 3 unordered list item.
+        """), "<ul><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul></ul></ul>")
 
         self.assertEqual(CONVERT("""
         - This is a level 1 unordered list item.
@@ -1104,6 +1128,21 @@ class UnorderedListTest(unittest.TestCase):
            - This is a level 4 unordered list item.
         - This is a level 1 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li><ul><li>This is a level 4 unordered list item.</li></ul></ul></ul><li>This is a level 1 unordered list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+          - This is a level 1 list item.
+         - This is a level 1 list item.
+        - This is a level 1 list item.
+        """), "<ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+          - This is a level 1 list item.
+         - This is a level 1 list item.
+        - This is a level 1 list item.
+        - This is a level 1 list item.
+         - This is a level 2 list item.
+          - This is a level 3 list item.
+        """), "<ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li><li>This is a level 1 list item.</li><ul><li>This is a level 2 list item.</li><ul><li>This is a level 3 list item.</li></ul></ul></ul>")
 
     def test_should_not_be_affected(self):
         self.assertEqual(CONVERT("-This should not be affected."),
