@@ -437,14 +437,30 @@ def convert(string):
     if string.strip() == "":
         return ""
 
+    open_tags = []
+    new_string = ""
+    add_line_break = False
+    open_paragraph = False
+
+    def convert_paragraph(line):
+        """
+        Convert a line into a paragraph.
+
+        Args:
+            line (str): Line to convert.
+
+        Returns:
+            str: Converted line.
+        """
+        nonlocal open_paragraph
+        if not open_paragraph:
+            open_paragraph = True
+            return f"<p>{line.lstrip()}"
+        return line
+
     # Ensure string ends with a newline to prevents inconsistencies.
     while string.splitlines()[-1] != "":
         string += "\n"
-
-    open_tags = []
-    new_string = ""
-    open_paragraph = False
-    add_line_break = False
 
     for line in string.splitlines():
         new_line = ""
@@ -489,19 +505,20 @@ def convert(string):
                 if tag["regex"].fullmatch(line):
                     new_line = convert_nested_tag(line, tag, open_tags)
 
-        # If not, check if there are open tags, if so, close them.
+        # If not, check if there are open tags, if so, close them. After doing
+        # so, check whether the line is a paragraph and add it accordingly.
         elif open_tags:
             for tag in reversed(open_tags):
                 new_line += tag[0]["outer_closing_tag"]
                 open_tags.remove(tag)
+            if is_paragraph(line):
+                new_line += convert_paragraph(line)
+            else:
+                new_line += line
 
         # If not, check if line is a paragraph, if so, open a paragraph.
         elif is_paragraph(line):
-            if not open_paragraph:
-                open_paragraph = True
-                new_line = f"<p>{line.lstrip()}"
-            else:
-                new_line = line
+            new_line += convert_paragraph(line)
 
         # If not, just add the line as it is.
         else:
