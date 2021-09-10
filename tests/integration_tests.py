@@ -143,6 +143,198 @@ class NestedTagTest(unittest.TestCase):
         self.assertEqual(CONVERT("> 1. - This is an unordered list item, inside an ordered list, inside a blockquote."),
                          "<blockquote><ol><li><ul><li>This is an unordered list item, inside an ordered list, inside a blockquote.</li></ul></li></ol></blockquote>")
 
+    def test_nested_tag_and_paragraph(self):
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+This is a paragraph.
+- This is a level 1 unordered list item.
+        """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul><p>This is a paragraph.</p><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+This is a paragraph.
+1. This is a level 1 ordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li></ol><p>This is a paragraph.</p><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+> This is a level 1 blockquote.
+This is a paragraph.
+> This is a level 1 blockquote.
+        """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote><p>This is a paragraph.</p><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+1. This is a level 1 ordered list item.
+This is a paragraph.
+> This is a level 1 blockquote.
+        """), "<ul><li>This is a level 1 unordered list item.</li></ul><ol><li>This is a level 1 ordered list item.</li></ol><p>This is a paragraph.</p><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+- This is a level 1 unordered list item.
+This is a paragraph.
+> This is a level 1 blockquote.
+        """), "<ol><li>This is a level 1 ordered list item.</li></ol><ul><li>This is a level 1 unordered list item.</li></ul><p>This is a paragraph.</p><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+- This is a level 1 unordered list item.
+This is a paragraph.
+1. This is a level 1 ordered list item.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><ul><li>This is a level 1 unordered list item.</li></ul><p>This is a paragraph.</p><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+> This is a level 1 blockquote.
+This is a paragraph.
+1. This is a level 1 ordered list item.
+        """), "<ul><li>This is a level 1 unordered list item.</li></ul><blockquote><p>This is a level 1 blockquote.</p></blockquote><p>This is a paragraph.</p><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+> This is a level 1 blockquote.
+This is a paragraph.
+- This is a level 1 unordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li></ol><blockquote><p>This is a level 1 blockquote.</p></blockquote><p>This is a paragraph.</p><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+1. This is a level 1 ordered list item.
+This is a paragraph.
+- This is a level 1 unordered list item.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><ol><li>This is a level 1 ordered list item.</li></ol><p>This is a paragraph.</p><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+    def test_nested_tag_and_line_break(self):
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+<br>
+- This is a level 1 unordered list item.
+        """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul><br><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+<br>
+1. This is a level 1 ordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li></ol><br><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+> This is a level 1 blockquote.
+<br>
+> This is a level 1 blockquote.
+        """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote><br><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+1. This is a level 1 ordered list item.
+<br>
+> This is a level 1 blockquote.
+        """), "<ul><li>This is a level 1 unordered list item.</li></ul><ol><li>This is a level 1 ordered list item.</li></ol><br><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+- This is a level 1 unordered list item.
+<br>
+> This is a level 1 blockquote.
+        """), "<ol><li>This is a level 1 ordered list item.</li></ol><ul><li>This is a level 1 unordered list item.</li></ul><br><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+- This is a level 1 unordered list item.
+<br>
+1. This is a level 1 ordered list item.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><ul><li>This is a level 1 unordered list item.</li></ul><br><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+> This is a level 1 blockquote.
+<br>
+1. This is a level 1 ordered list item.
+        """), "<ul><li>This is a level 1 unordered list item.</li></ul><blockquote><p>This is a level 1 blockquote.</p></blockquote><br><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+> This is a level 1 blockquote.
+<br>
+- This is a level 1 unordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li></ol><blockquote><p>This is a level 1 blockquote.</p></blockquote><br><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+1. This is a level 1 ordered list item.
+<br>
+- This is a level 1 unordered list item.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><ol><li>This is a level 1 ordered list item.</li></ol><br><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+    def test_nested_tag_and_empty_line(self):
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+
+- This is a level 1 unordered list item.
+        """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+
+1. This is a level 1 ordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li></ol><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+> This is a level 1 blockquote.
+
+> This is a level 1 blockquote.
+        """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+1. This is a level 1 ordered list item.
+
+> This is a level 1 blockquote.
+        """), "<ul><li>This is a level 1 unordered list item.</li></ul><ol><li>This is a level 1 ordered list item.</li></ol><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+- This is a level 1 unordered list item.
+
+> This is a level 1 blockquote.
+        """), "<ol><li>This is a level 1 ordered list item.</li></ol><ul><li>This is a level 1 unordered list item.</li></ul><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+- This is a level 1 unordered list item.
+
+1. This is a level 1 ordered list item.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><ul><li>This is a level 1 unordered list item.</li></ul><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+- This is a level 1 unordered list item.
+> This is a level 1 blockquote.
+
+1. This is a level 1 ordered list item.
+        """), "<ul><li>This is a level 1 unordered list item.</li></ul><blockquote><p>This is a level 1 blockquote.</p></blockquote><ol><li>This is a level 1 ordered list item.</li></ol>")
+
+        self.assertEqual(CONVERT("""
+1. This is a level 1 ordered list item.
+> This is a level 1 blockquote.
+
+- This is a level 1 unordered list item.
+        """), "<ol><li>This is a level 1 ordered list item.</li></ol><blockquote><p>This is a level 1 blockquote.</p></blockquote><ul><li>This is a level 1 unordered list item.</li></ul>")
+
+        self.assertEqual(CONVERT("""
+> This is a level 1 blockquote.
+1. This is a level 1 ordered list item.
+
+- This is a level 1 unordered list item.
+        """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><ol><li>This is a level 1 ordered list item.</li></ol><ul><li>This is a level 1 unordered list item.</li></ul>")
+
 
 if __name__ == '__main__':
     unittest.main()
