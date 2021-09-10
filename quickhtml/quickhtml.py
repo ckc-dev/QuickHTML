@@ -181,7 +181,8 @@ NESTED_TAGS = (
         "outer_closing_tag": "</blockquote>",
         "inner_opening_tag": "<p>",
         "inner_closing_tag": "</p>",
-        "inner_ignore_tags": INDEPENDENT_TAGS
+        "inner_ignore_tags": INDEPENDENT_TAGS,
+        "minimum_level": 1
     },
     {
         "regex": REGEX_ORDERED_LIST,
@@ -189,7 +190,8 @@ NESTED_TAGS = (
         "outer_closing_tag": "</ol>",
         "inner_opening_tag": "<li>",
         "inner_closing_tag": "</li>",
-        "inner_ignore_tags": None
+        "inner_ignore_tags": None,
+        "minimum_level": 0
     },
     {
         "regex": REGEX_UNORDERED_LIST,
@@ -197,7 +199,8 @@ NESTED_TAGS = (
         "outer_closing_tag": "</ul>",
         "inner_opening_tag": "<li>",
         "inner_closing_tag": "</li>",
-        "inner_ignore_tags": None
+        "inner_ignore_tags": None,
+        "minimum_level": 0
     }
 )
 
@@ -337,9 +340,18 @@ def convert_nested_tag(line, cur_tag, open_tags):
     except IndexError:
         last_tag_level = 0
     try:
-        cur_tag_level = max(1, len(match[1]))
+        # 1 is added to ensure level is never less than 1. This prevents
+        # inconsistent behavior from arising due to lists minimum level being
+        # zero, and blockquotes minimum level being 1. This mainly addresses
+        # inconsistencies when tags are used separately.
+        cur_tag_level = len(match[1]) + 1
     except TypeError:
         cur_tag_level = 1
+
+    # Tag minimum level is removed from the current level due to the same
+    # reason as above. This mainly addresses inconsistencies when tags are
+    # mixed.
+    cur_tag_level -= cur_tag["minimum_level"]
 
     content = convert_inline(match[2])
 
