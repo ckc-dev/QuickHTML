@@ -452,10 +452,11 @@ def convert(string):
         Returns:
             str: Converted line.
         """
+        line = f"{line.strip()} "
         nonlocal open_paragraph
         if not open_paragraph:
             open_paragraph = True
-            return f"<p>{line.lstrip()}"
+            return f"<p>{line}"
         return line
 
     # Ensure string ends with a newline to prevents inconsistencies.
@@ -541,6 +542,7 @@ def convert(string):
         # Close paragraph.
         if open_paragraph and not is_paragraph(new_line):
             open_paragraph = False
+            new_string = new_string.rstrip()
             new_line = f"</p>{new_line}"
 
         new_string += new_line
