@@ -492,10 +492,6 @@ class EscapedCharacters(unittest.TestCase):
         self.assertEqual(CONVERT("\_This should not be affected.\_"),
                          "<p>_This should not be affected._</p>")
 
-    def test_line_break(self):
-        self.assertEqual(CONVERT("Here's a paragraph followed by two spaces instead of a line break. \ "),
-                         "<p>Here's a paragraph followed by two spaces instead of a line break.  </p>")
-
     def test_link(self):
         self.assertEqual(CONVERT("\[This should not be affected.](Not a link.)"),
                          "<p>[This should not be affected.](Not a link.)</p>")
@@ -773,7 +769,7 @@ class LineBreakTest(unittest.TestCase):
         self.assertEqual(CONVERT("  This should be a paragraph with no line breaks."),
                          "<p>This should be a paragraph with no line breaks.</p>")
         self.assertEqual(CONVERT("This should be a paragraph with no line breaks. "),
-                         "<p>This should be a paragraph with no line breaks. </p>")
+                         "<p>This should be a paragraph with no line breaks.</p>")
 
 
 class LinkTest(unittest.TestCase):
@@ -988,6 +984,23 @@ class ParagraphTest(unittest.TestCase):
     def test_multiline(self):
         self.assertEqual(CONVERT("This \nis \na \nmultiline \nparagraph."),
                          "<p>This is a multiline paragraph.</p>")
+
+        self.assertEqual(CONVERT("""
+This
+is
+a
+multiline
+paragraph.
+        """), "<p>This is a multiline paragraph.</p>")
+
+        self.assertEqual(CONVERT("""
+            This
+            is
+            a
+            multiline
+            paragraph.
+            """), "<p>This is a multiline paragraph.</p>")
+
         self.assertEqual(CONVERT("This is a multiline paragraph.  \nIt has a line break."),
                          "<p>This is a multiline paragraph.<br>It has a line break.</p>")
 
