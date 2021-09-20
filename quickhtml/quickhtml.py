@@ -171,7 +171,7 @@ INDEPENDENT_TAGS = (
     "<code",        # Code.
     "<blockquote",  # Blockquotes.
     "<ol",          # Ordered lists.
-    "<ul",          # Ordered lists.
+    "<ul",          # Unordered lists.
 )
 
 NESTED_TAGS = (
@@ -424,6 +424,41 @@ def convert_nested_tag(line, cur_tag, open_tags):
     return new_line
 
 
+def add_inline_tags(line):
+    """
+    Add inline tags, such as <em> and <strong>, to a line.
+
+    Args:
+        line (str): Line to add tags to.
+
+    Returns:
+        line (str): Converted line.
+    """
+    # Add emphasis.
+    # The order here is important, otherwise "**bold**" would be converted
+    # to "*<em>bold</em>*", instead of "<strong>bold</strong>".
+    line = REGEX_BOLD.sub("<strong>\\1\\2</strong>", line)
+    line = REGEX_ITALIC.sub("<em>\\1\\2</em>", line)
+
+    # Add images and links.
+    # The order here is important, otherwise images wouldn't work.
+    if REGEX_IMAGE.search(line):
+        match = REGEX_LINK.search(line)
+        alt_text, url, title = match.groups()
+        line = REGEX_IMAGE.sub(
+            f'<img src="{url}" alt="{alt_text}"'
+            + (f' title="{title}"' if title else '')
+            + '>', line)
+    if REGEX_LINK.search(line):
+        match = REGEX_LINK.search(line)
+        alt_text, url, title = match.groups()
+        line = REGEX_LINK.sub(
+            f'<a href="{url}"'
+            + (f' title="{title}"' if title else '')
+            + f'>{alt_text}</a>', line)
+    return line
+
+
 def convert(string):
     """
     Convert Markdown into HTML.
@@ -469,36 +504,31 @@ def convert(string):
         # Add horizontal rules.
         line = REGEX_HORIZONTAL_RULE.sub("<hr>", line)
 
-        # Add emphasis.
-        # The order here is important, otherwise "**bold**" would be converted
-        # to "*<em>bold</em>*", instead of "<strong>bold</strong>".
-        line = REGEX_BOLD.sub("<strong>\\1\\2</strong>", line)
-        line = REGEX_ITALIC.sub("<em>\\1\\2</em>", line)
-
-        # Add code.
-        line = REGEX_CODE.sub("<code>\\1\\2</code>", line)
-
-        # Add images and links.
-        # The order here is important, otherwise images wouldn't work.
-        if REGEX_IMAGE.search(line):
-            match = REGEX_LINK.search(line)
-            alt_text, url, title = match.groups()
-            line = REGEX_IMAGE.sub(
-                f'<img src="{url}" alt="{alt_text}"'
-                + (f' title="{title}"' if title else '')
-                + '>', line)
-        if REGEX_LINK.search(line):
-            match = REGEX_LINK.search(line)
-            alt_text, url, title = match.groups()
-            line = REGEX_LINK.sub(
-                f'<a href="{url}"'
-                + (f' title="{title}"' if title else '')
-                + f'>{alt_text}</a>', line)
-
         # Add headings.
         if REGEX_HEADING.search(line):
             level = len(REGEX_HEADING.search(line)[2])
             line = REGEX_HEADING.sub(f"\\1<h{level}>\\3</h{level}>\\4", line)
+
+        # Store information about code blocks.
+        code_blocks = []
+        if REGEX_CODE.search(line):
+            matches = ["".join(i or "") for i in REGEX_CODE.findall(line)]
+            right = REGEX_CODE.sub("\\1\\2", line)
+            for match in matches:
+                left, right = right.split(match, 1)
+                code_blocks.append(
+                    {"left": left, "content": match, "right": right})
+
+        # Add code and inline tags.
+        if code_blocks:
+            line = ""
+            for block in code_blocks:
+                left = add_inline_tags(block["left"])
+                line += (left + f"<code>{block['content']}</code>")
+                if block == code_blocks[-1]:
+                    line += add_inline_tags(block["right"])
+        else:
+            line = add_inline_tags(line)
 
         # Check if line contains nested tags, if so, open tags.
         if any(tag["regex"].fullmatch(line) for tag in NESTED_TAGS):
