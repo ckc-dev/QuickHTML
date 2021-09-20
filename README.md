@@ -1,8 +1,8 @@
 # QuickHTML
 
-A simple Markdown to HTML preprocessor that does not require any third-party modules.
+A simple Markdown to HTML preprocessor that doesn't require any third-party modules.
 
-Quickly gererate HTML from Markdown, using python.
+Quickly generate HTML from Markdown, using python.
 
 ## Technologies used
 
@@ -35,11 +35,11 @@ The `convert()` function accepts a string, and returns it formatted as HTML:
 >>> ...
 ```
 
-The `convert_file()` function accepts a file path, and returns its contents formatted as HTML:
+The `convert_file()` function accepts a file path, and returns the file content formatted as HTML:
 
 ```
->>> file = "../my_folder/my_markdown_documents/example_document.md"
->>> quickhtml.convert_file(file)
+>>> file_path = "./markdown_documents/example_document.md"
+>>> quickhtml.convert_file(file_path)
 '<p>This is an example document.</p>'
 >>> ...
 ```
