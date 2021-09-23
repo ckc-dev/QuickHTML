@@ -161,6 +161,16 @@ class CodeTest(unittest.TestCase):
         self.assertEqual(CONVERT("``This is some code containing `backticks`.``"),
                          "<code>This is some code containing `backticks`.</code>")
 
+    def test_ignore_inline_tags(self):
+        self.assertEqual(CONVERT("`These _are_ some *words* that _would_ be *in* italics _if_ they *weren't* denoted _as_ code.`"),
+                         "<code>These _are_ some *words* that _would_ be *in* italics _if_ they *weren't* denoted _as_ code.</code>")
+        self.assertEqual(CONVERT("`These __are__ some **words** that __would__ be **in** bold __if__ they **weren't** denoted __as__ code.`"),
+                         "<code>These __are__ some **words** that __would__ be **in** bold __if__ they **weren't** denoted __as__ code.</code>")
+        self.assertEqual(CONVERT("`[This](would be a link if it wasn't denoted as code.)`"),
+                         "<code>[This](would be a link if it wasn't denoted as code.)</code>")
+        self.assertEqual(CONVERT("`![This](would be an image if it wasn't denoted as code.)`"),
+                         "<code>![This](would be an image if it wasn't denoted as code.)</code>")
+
     def test_extra_leading_space(self):
         self.assertEqual(CONVERT("     `This is some text denoted as code with 5 extra leading spaces.`"),
                          "<code>This is some text denoted as code with 5 extra leading spaces.</code>")
