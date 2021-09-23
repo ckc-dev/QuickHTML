@@ -163,17 +163,6 @@ REGEX_UNORDERED_LIST = re.compile(r"""
             # times as possible.
     \s*     # Match between 0 and ∞ whitespaces.""", re.VERBOSE)
 
-# Tags that do not need be enclosed in <p> tags:
-INDEPENDENT_TAGS = (
-    "<h",           # Headings and horizontal rules.
-    "<a",           # Links.
-    "<img",         # Images.
-    "<code",        # Code.
-    "<blockquote",  # Blockquotes.
-    "<ol",          # Ordered lists.
-    "<ul",          # Unordered lists.
-)
-
 NESTED_TAGS = (
     {
         "regex": REGEX_BLOCKQUOTE,
@@ -181,7 +170,6 @@ NESTED_TAGS = (
         "outer_closing_tag": "</blockquote>",
         "inner_opening_tag": "<p>",
         "inner_closing_tag": "</p>",
-        "inner_ignore_tags": INDEPENDENT_TAGS,
         "minimum_level": 1
     },
     {
@@ -190,7 +178,6 @@ NESTED_TAGS = (
         "outer_closing_tag": "</ol>",
         "inner_opening_tag": "<li>",
         "inner_closing_tag": "</li>",
-        "inner_ignore_tags": None,
         "minimum_level": 0
     },
     {
@@ -199,26 +186,44 @@ NESTED_TAGS = (
         "outer_closing_tag": "</ul>",
         "inner_opening_tag": "<li>",
         "inner_closing_tag": "</li>",
-        "inner_ignore_tags": None,
         "minimum_level": 0
     }
 )
 
 
-def is_paragraph(line):
+def check_paragraph(line):
     """
-    Check if a line is a paragraph.
+    Check whether or not a line should be enclosed in paragraph tags.
 
     Args:
         line (str): Line to check.
 
     Returns:
-        bool: Whether or not the line is a paragraph.
+        bool: Whether or not the line should be enclosed in paragraph tags.
     """
     line = line.strip()
 
     # A paragraph can start with a "<br>", but not just be a "<br>".
-    return line not in ("", "<br>") and not line.startswith(INDEPENDENT_TAGS)
+    if line in ("", "<br>", "<hr>"):
+        return False
+
+    # Tags that do not need be enclosed in <p> tags:
+    INDEPENDENT_TAGS = {
+        "<h": r"""<h[1-6]>.+<\/h[1-6]>""",
+        "<a": r"""<a\s+href="[^"]+?"\s*(?:\s*title="[^"]+?")?>.+<\/a>""",
+        "<img": r"""<img\s+src="[^"]+?"\s*alt="[^"]+?"(?:\s*title="[^"]+?")?>""",
+        "<code": r"""<code>.+</code>""",
+        "<blockquote": r"""<blockquote>.+""",
+        "<ol": r"""<ol>.+""",
+        "<ul": r"""<ul>.+""",
+    }
+
+    for tag, pattern in INDEPENDENT_TAGS.items():
+        if line.startswith(tag):
+            # If the line matches the pattern, it is not a paragraph.
+            return not re.fullmatch(pattern, line)
+    return True
+
 
 
 def convert_nested_tag(line, cur_tag, open_tags):
@@ -274,9 +279,10 @@ def convert_nested_tag(line, cur_tag, open_tags):
         """
         Add opening and closing inner tags to a string, if required.
 
-        Inner tags will be added to string only if the string does not start
-        with a tag ignored by this tag. For example, lists within blockquotes
-        should not be surrounded by paragraph tags, so they are ignored.
+        If the inner tags are paragraphs, it will then be decided whether or
+        not the string has to be enclosed in paragraph tags. Otherwise, it is
+        enclosed in the inner tags. For example, lists within blockquotes
+        should not be enclosed in paragraph tags.
 
         Args:
             string (str): String to add tags to.
@@ -285,9 +291,9 @@ def convert_nested_tag(line, cur_tag, open_tags):
         Returns:
             string: Resulting string.
         """
-        ignored = tag["inner_ignore_tags"]
-        if ignored and any(string.startswith(i) for i in ignored):
-            return string
+        if tag["inner_opening_tag"] == "<p>":
+            return f"<p>{string}</p>" if check_paragraph(string) else string
+
         return "".join((
             tag["inner_opening_tag"],
             string,
@@ -512,7 +518,7 @@ def convert(string):
         # Store information about code blocks.
         code_blocks = []
         if REGEX_CODE.search(line):
-            matches = ["".join(i or "") for i in REGEX_CODE.findall(line)]
+            matches = ("".join(i or "") for i in REGEX_CODE.findall(line))
             right = REGEX_CODE.sub("\\1\\2", line)
             for match in matches:
                 left, right = right.split(match, 1)
@@ -524,7 +530,7 @@ def convert(string):
             line = ""
             for block in code_blocks:
                 left = add_inline_tags(block["left"])
-                line += (left + f"<code>{block['content']}</code>")
+                line += left + f"<code>{block['content']}</code>"
                 if block == code_blocks[-1]:
                     line += add_inline_tags(block["right"])
         else:
@@ -542,13 +548,13 @@ def convert(string):
             for tag in reversed(open_tags):
                 new_line += tag[0]["outer_closing_tag"]
                 open_tags.remove(tag)
-            if is_paragraph(line):
+            if check_paragraph(line):
                 new_line += convert_paragraph(line)
             else:
                 new_line += line
 
         # If not, check if line is a paragraph, if so, open a paragraph.
-        elif is_paragraph(line):
+        elif check_paragraph(line):
             new_line += convert_paragraph(line)
 
         # If not, just add the line as it is.
@@ -570,7 +576,7 @@ def convert(string):
             add_line_break = True
 
         # Close paragraph.
-        if open_paragraph and not is_paragraph(new_line):
+        if open_paragraph and not check_paragraph(new_line):
             open_paragraph = False
             new_string = new_string.rstrip()
             new_line = f"</p>{new_line}"
