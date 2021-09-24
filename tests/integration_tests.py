@@ -387,5 +387,19 @@ This is a paragraph.
         """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><ol><li>This is a level 1 ordered list item.</li></ol><ul><li>This is a level 1 unordered list item.</li></ul>")
 
 
+class ParagraphAndInlineTagTest(unittest.TestCase):
+    def test_code(self):
+        self.assertEqual(CONVERT("`This is some code` followed by more text."),
+                         "<p><code>This is some code</code> followed by more text.</p>")
+
+    def test_link(self):
+        self.assertEqual(CONVERT("[This is a link](Link URL.) followed by more text."),
+                         "<p><a href=\"Link URL.\">This is a link</a> followed by more text.</p>")
+
+    def test_image(self):
+        self.assertEqual(CONVERT("![This is an image](Image path or URL.) followed by more text."),
+                         "<p><img src=\"Image path or URL.\" alt=\"This is an image\"> followed by more text.</p>")
+
+
 if __name__ == '__main__':
     unittest.main()
