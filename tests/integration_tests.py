@@ -11,6 +11,57 @@ SPEC.loader.exec_module(QUICKHTML_MODULE)
 CONVERT = getattr(QUICKHTML_MODULE, "convert")
 
 
+class HeadingAndNestedTagTest(unittest.TestCase):
+    def test_blockquote(self):
+        self.assertEqual(CONVERT("># This is a level 1 heading inside a blockquote."),
+                         "<blockquote><h1>This is a level 1 heading inside a blockquote.</h1></blockquote>")
+
+        self.assertEqual(CONVERT("> >## This is a level 2 heading inside a blockquote, inside another blockquote."),
+                         "<blockquote><blockquote><h2>This is a level 2 heading inside a blockquote, inside another blockquote.</h2></blockquote></blockquote>")
+
+        self.assertEqual(CONVERT("> > >### This is a level 3 heading, nested within three blockquotes."),
+                         "<blockquote><blockquote><blockquote><h3>This is a level 3 heading, nested within three blockquotes.</h3></blockquote></blockquote></blockquote>")
+
+    def test_unordered_list(self):
+        self.assertEqual(CONVERT("- # This is a level 1 heading inside an unordered list."),
+                         "<ul><li><h1>This is a level 1 heading inside an unordered list.</h1></li></ul>")
+
+        self.assertEqual(CONVERT("- - ## This is a level 2 heading inside an unordered list, inside another unordered list."),
+                         "<ul><li><ul><li><h2>This is a level 2 heading inside an unordered list, inside another unordered list.</h2></li></ul></li></ul>")
+
+        self.assertEqual(CONVERT("- - - ### This is a level 3 heading, nested within three uls."),
+                         "<ul><li><ul><li><ul><li><h3>This is a level 3 heading, nested within three uls.</h3></li></ul></li></ul></li></ul>")
+
+    def test_ordered_list(self):
+        self.assertEqual(CONVERT("1. # This is a level 1 heading inside an ordered list."),
+                         "<ol><li><h1>This is a level 1 heading inside an ordered list.</h1></li></ol>")
+
+        self.assertEqual(CONVERT("1. 1. ## This is a level 2 heading inside an ordered list, inside another ordered list."),
+                         "<ol><li><ol><li><h2>This is a level 2 heading inside an ordered list, inside another ordered list.</h2></li></ol></li></ol>")
+
+        self.assertEqual(CONVERT("1. 1. 1. ### This is a level 3 heading, nested within three uls."),
+                         "<ol><li><ol><li><ol><li><h3>This is a level 3 heading, nested within three uls.</h3></li></ol></li></ol></li></ol>")
+
+    def test_mixed_tags(self):
+        self.assertEqual(CONVERT("- 1. ># This is a level 1 heading, nested within a blockquote, an ordered list, and an unordered list."),
+                         "<ul><li><ol><li><blockquote><h1>This is a level 1 heading, nested within a blockquote, an ordered list, and an unordered list.</h1></blockquote></li></ol></li></ul>")
+
+        self.assertEqual(CONVERT("1. - ># This is a level 1 heading, nested within a blockquote, an unordered list, and an ordered list."),
+                         "<ol><li><ul><li><blockquote><h1>This is a level 1 heading, nested within a blockquote, an unordered list, and an ordered list.</h1></blockquote></li></ul></li></ol>")
+
+        self.assertEqual(CONVERT(">- 1. # This is a level 1 heading, nested within an ordered list, an unordered list, and a blockquote."),
+                         "<blockquote><ul><li><ol><li><h1>This is a level 1 heading, nested within an ordered list, an unordered list, and a blockquote.</h1></li></ol></li></ul></blockquote>")
+
+        self.assertEqual(CONVERT("- >1. # This is a level 1 heading, nested within an ordered list, a blockquote, and an unordered list."),
+                         "<ul><li><blockquote><ol><li><h1>This is a level 1 heading, nested within an ordered list, a blockquote, and an unordered list.</h1></li></ol></blockquote></li></ul>")
+
+        self.assertEqual(CONVERT("1. >- # This is a level 1 heading, nested within an unordered list, a blockquote, and an ordered list."),
+                         "<ol><li><blockquote><ul><li><h1>This is a level 1 heading, nested within an unordered list, a blockquote, and an ordered list.</h1></li></ul></blockquote></li></ol>")
+
+        self.assertEqual(CONVERT(">1. - # This is a level 1 heading, nested within an unordered list, an ordered list, and a blockquote."),
+                         "<blockquote><ol><li><ul><li><h1>This is a level 1 heading, nested within an unordered list, an ordered list, and a blockquote.</h1></li></ul></li></ol></blockquote>")
+
+
 class NestedTagTest(unittest.TestCase):
     def test_mixed_tags(self):
         self.assertEqual(CONVERT("""
