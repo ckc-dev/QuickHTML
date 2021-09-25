@@ -52,6 +52,20 @@ REGEX_CODE = re.compile(r"""
     (?=[^`]|$)  # Make sure there is a line end or a character other than "`"
                 # ahead.""", re.VERBOSE)
 
+REGEX_QUICK_EMAIL = re.compile(r"""
+    <               # Match "<" once.
+    (               # CAPTURE GROUP (1) | Open capture group.
+        [\w\d_.+-]+ # Match either a word character, a digit, "_", ".", "+", or
+                    # "-", between 1 and ∞ times.
+        @           # Match "@" once.
+        [\w\d-]+    # Match either a word character, a digit, or "-", between 1
+                    # and ∞ times.
+        \.          # Match "." once.
+        [\w\d.-]+   # Match either a word character, a digit, ".", or "-",
+                    # between 1 and ∞ times.
+    )               # Close capture group.
+    >               # Match ">" once. """, re.VERBOSE)
+
 REGEX_ESCAPED_CHARACTER = re.compile(r"""
     \\  # Match "\" once.
     (.) # CAPTURE GROUP (1) | Match any character once.""", re.VERBOSE)
@@ -223,7 +237,6 @@ def check_paragraph(line):
             # If the line matches the pattern, it is not a paragraph.
             return not re.fullmatch(pattern, line)
     return True
-
 
 
 def convert_nested_tag(line, cur_tag, open_tags):
@@ -462,6 +475,13 @@ def add_inline_tags(line):
             f'<a href="{url}"'
             + (f' title="{title}"' if title else '')
             + f'>{alt_text}</a>', line)
+
+    # Add quick email links.
+    if REGEX_QUICK_EMAIL.search(line):
+        match = REGEX_QUICK_EMAIL.search(line)
+        address = match.group(1)
+        line = REGEX_QUICK_EMAIL.sub(
+            f'<a href="mailto:{address}">{address}</a>', line)
     return line
 
 
