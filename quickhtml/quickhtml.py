@@ -52,20 +52,6 @@ REGEX_CODE = re.compile(r"""
     (?=[^`]|$)  # Make sure there is a line end or a character other than "`"
                 # ahead.""", re.VERBOSE)
 
-REGEX_QUICK_EMAIL = re.compile(r"""
-    <               # Match "<" once.
-    (               # CAPTURE GROUP (1) | Open capture group.
-        [\w\d_.+-]+ # Match either a word character, a digit, "_", ".", "+", or
-                    # "-", between 1 and ∞ times.
-        @           # Match "@" once.
-        [\w\d-]+    # Match either a word character, a digit, or "-", between 1
-                    # and ∞ times.
-        \.          # Match "." once.
-        [\w\d.-]+   # Match either a word character, a digit, ".", or "-",
-                    # between 1 and ∞ times.
-    )               # Close capture group.
-    >               # Match ">" once. """, re.VERBOSE)
-
 REGEX_ESCAPED_CHARACTER = re.compile(r"""
     \\  # Match "\" once.
     (.) # CAPTURE GROUP (1) | Match any character once.""", re.VERBOSE)
@@ -167,6 +153,45 @@ REGEX_ORDERED_LIST = re.compile(r"""
     (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
             # times as possible.
     \s*     # Match between 0 and ∞ whitespaces.""", re.VERBOSE)
+
+REGEX_QUICK_EMAIL = re.compile(r"""
+    <               # Match "<" once.
+    (               # CAPTURE GROUP (1) | Open capture group.
+        [\w\d_.+-]+ # Match either a word character, a digit, "_", ".", "+", or
+                    # "-", between 1 and ∞ times.
+        @           # Match "@" once.
+        [\w\d-]+    # Match either a word character, a digit, or "-", between 1
+                    # and ∞ times.
+        \.          # Match "." once.
+        [\w\d.-]+   # Match either a word character, a digit, ".", or "-",
+                    # between 1 and ∞ times.
+    )               # CAPTURE GROUP (1) | Close and match capture group.
+    >               # Match ">" once.""", re.VERBOSE)
+
+REGEX_QUICK_LINK = re.compile(r"""
+    <                   # Match "<" once.
+    (                   # CAPTURE GROUP (1) | Open capture group.
+        https?          # Match either "http" or "https".
+        ://             # Match "://" once.
+        (?:             # Open non-capturing group.
+            -           # Match "-" once.
+            \.          # Match "." once.
+        )?              # Close non-capturing group and match it either 0 or 1
+                        # times.
+        (?:             # Open non-capturing group.
+            [^\s/?.#-]+ # Match any character that is not a whitespace, "/",
+                        # "?", ".", "#", or "-", between 1 and ∞ times.
+            \.?         # Match ".", either 0 or 1 times.
+        )+              # Close non-capturing group and match it between 1 and
+                        # ∞ times.
+        (?:             # Open non-capturing group.
+            /           # Match "/" once.
+            [^\s]*      # Match any character that is not a whitespace, between
+                        # 0 and ∞ times.
+        )?              # Close non-capturing group and match it either 0 or 1
+                        # times.
+    )                   # CAPTURE GROUP (1) | Close and match capture group.
+    >                   # Match ">" once.""", re.VERBOSE)
 
 REGEX_UNORDERED_LIST = re.compile(r"""
     (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
@@ -482,6 +507,12 @@ def add_inline_tags(line):
         address = match.group(1)
         line = REGEX_QUICK_EMAIL.sub(
             f'<a href="mailto:{address}">{address}</a>', line)
+
+    # Add quick links.
+    if REGEX_QUICK_LINK.search(line):
+        match = REGEX_QUICK_LINK.search(line)
+        address = match.group(1)
+        line = REGEX_QUICK_LINK.sub(f'<a href="{address}">{address}</a>', line)
     return line
 
 
