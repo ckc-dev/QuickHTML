@@ -813,6 +813,24 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(CONVERT("This is a [     link     ](     Link URL.     \"This is a title.\"     ) inside a paragraph."),
                          "<p>This is a <a href=\"Link URL.\" title=\"This is a title.\">link</a> inside a paragraph.</p>")
 
+    def test_quick_link(self):
+        self.assertEqual(CONVERT("<This should not be affected.>"),
+                         "<p><This should not be affected.></p>")
+        self.assertEqual(CONVERT("<> This should not be affected."),
+                         "<p><> This should not be affected.</p>")
+        self.assertEqual(CONVERT("This should not be affected. <>"),
+                         "<p>This should not be affected. <></p>")
+        self.assertEqual(CONVERT("<http://example.http.link>"),
+                         "<a href=\"http://example.http.link\">http://example.http.link</a>")
+        self.assertEqual(CONVERT("<https://example.https.link>"),
+                         "<a href=\"https://example.https.link\">https://example.https.link</a>")
+        self.assertEqual(CONVERT("<https://example.link/with/slashes>"),
+                         "<a href=\"https://example.link/with/slashes\">https://example.link/with/slashes</a>")
+        self.assertEqual(CONVERT("<https://example.link/with#pounds>"),
+                         "<a href=\"https://example.link/with#pounds\">https://example.link/with#pounds</a>")
+        self.assertEqual(CONVERT("<https://example.link/with-dashes>"),
+                         "<a href=\"https://example.link/with-dashes\">https://example.link/with-dashes</a>")
+
 
 class OrderedListTest(unittest.TestCase):
     def test_empty_ordered_list(self):
