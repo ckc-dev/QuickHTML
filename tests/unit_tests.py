@@ -831,6 +831,24 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(CONVERT("<https://example.link/with-dashes>"),
                          "<a href=\"https://example.link/with-dashes\">https://example.link/with-dashes</a>")
 
+    def test_quick_email(self):
+        self.assertEqual(CONVERT("<This should not be affected.>"),
+                         "<p><This should not be affected.></p>")
+        self.assertEqual(CONVERT("<> This should not be affected."),
+                         "<p><> This should not be affected.</p>")
+        self.assertEqual(CONVERT("This should not be affected. <>"),
+                         "<p>This should not be affected. <></p>")
+        self.assertEqual(CONVERT("<email@domain.example>"),
+                         "<a href=\"mailto:email@domain.example\">email@domain.example</a>")
+        self.assertEqual(CONVERT("<email@domain-containing-dashes.example>"),
+                         "<a href=\"mailto:email@domain-containing-dashes.example\">email@domain-containing-dashes.example</a>")
+        self.assertEqual(CONVERT("<email-containing-dashes@domain.example>"),
+                         "<a href=\"mailto:email-containing-dashes@domain.example\">email-containing-dashes@domain.example</a>")
+        self.assertEqual(CONVERT("<email.containing.dots@domain.example>"),
+                         "<a href=\"mailto:email.containing.dots@domain.example\">email.containing.dots@domain.example</a>")
+        self.assertEqual(CONVERT("<email+containing+plus+signs@domain.example>"),
+                         "<a href=\"mailto:email+containing+plus+signs@domain.example\">email+containing+plus+signs@domain.example</a>")
+
 
 class OrderedListTest(unittest.TestCase):
     def test_empty_ordered_list(self):
