@@ -26,12 +26,12 @@ class BlockquoteTest(unittest.TestCase):
                          "<blockquote><p>This is a blockquote.</p></blockquote>")
 
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     >This a blockquote with 5 extra leading spaces."),
-                         "<blockquote><p>This a blockquote with 5 extra leading spaces.</p></blockquote>")
-        self.assertEqual(CONVERT("     >>This a blockquote with 5 extra leading spaces."),
-                         "<blockquote><p>This a blockquote with 5 extra leading spaces.</p></blockquote>")
-        self.assertEqual(CONVERT("     >>>This a blockquote with 5 extra leading spaces."),
-                         "<blockquote><p>This a blockquote with 5 extra leading spaces.</p></blockquote>")
+        self.assertEqual(CONVERT("   >This a blockquote with 3 extra leading spaces."),
+                         "<blockquote><p>This a blockquote with 3 extra leading spaces.</p></blockquote>")
+        self.assertEqual(CONVERT("   >>This a blockquote with 3 extra leading spaces."),
+                         "<blockquote><p>This a blockquote with 3 extra leading spaces.</p></blockquote>")
+        self.assertEqual(CONVERT("   >>>This a blockquote with 3 extra leading spaces."),
+                         "<blockquote><p>This a blockquote with 3 extra leading spaces.</p></blockquote>")
 
     def test_extra_trailing_space(self):
         self.assertEqual(CONVERT(">This a blockquote with 5 extra trailing spaces.     "),
@@ -55,15 +55,15 @@ class BlockquoteTest(unittest.TestCase):
                                     >This is a level 1 blockquote."""), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >>>>>This is a level 1 blockquote.
-        >>>>>This is a level 1 blockquote.
-        >>>>>This is a level 1 blockquote.
+>>>>>This is a level 1 blockquote.
+>>>>>This is a level 1 blockquote.
+>>>>>This is a level 1 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
@@ -73,71 +73,71 @@ class BlockquoteTest(unittest.TestCase):
         """), "<blockquote><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >This is a level 1 blockquote.
-        >>This is a level 2 blockquote.
-        >>>This is a level 3 blockquote.
+   >This is a level 1 blockquote.
+   >>This is a level 2 blockquote.
+   >>>This is a level 3 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >>>>>This is a level 1 blockquote.
-        >>>>>>>>This is a level 2 blockquote.
-        >>>>>>>>>>>This is a level 3 blockquote.
+>>>>>This is a level 1 blockquote.
+>>>>>>>>This is a level 2 blockquote.
+>>>>>>>>>>>This is a level 3 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
         self.assertEqual(CONVERT("""
-            >This is a level 1 blockquote.
-            >This is a level 1 blockquote.
-            >>>>>>>>>>>>>>>>>>>>This is a level 2 blockquote.
-            >This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>>>>>>>>>>>>>>>>>>>>This is a level 2 blockquote.
+>This is a level 1 blockquote.
             """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p></blockquote><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >>This is a level 2 blockquote.
-        >>This is a level 2 blockquote.
-        >>>This is a level 3 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>>This is a level 2 blockquote.
+>>This is a level 2 blockquote.
+>>>This is a level 3 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >>This is a level 2 blockquote.
-        >>This is a level 2 blockquote.
-        >>>This is a level 3 blockquote.
-        >>This is a level 2 blockquote.
-        >>This is a level 2 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>>This is a level 2 blockquote.
+>>This is a level 2 blockquote.
+>>>This is a level 3 blockquote.
+>>This is a level 2 blockquote.
+>>This is a level 2 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote><p>This is a level 2 blockquote.</p><p>This is a level 2 blockquote.</p></blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >>This is a level 2 blockquote.
-        >>This is a level 2 blockquote.
-        >>>This is a level 3 blockquote.
-        >>>>This is a level 4 blockquote.
-        >This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>>This is a level 2 blockquote.
+>>This is a level 2 blockquote.
+>>>This is a level 3 blockquote.
+>>>>This is a level 4 blockquote.
+>This is a level 1 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p><blockquote><p>This is a level 4 blockquote.</p></blockquote></blockquote></blockquote><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >>>This is a level 1 blockquote.
-        >>This is a level 1 blockquote.
-        >This is a level 1 blockquote.
+>>>This is a level 1 blockquote.
+>>This is a level 1 blockquote.
+>This is a level 1 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p></blockquote>")
 
         self.assertEqual(CONVERT("""
-        >>>This is a level 1 blockquote.
-        >>This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >This is a level 1 blockquote.
-        >>This is a level 2 blockquote.
-        >>>This is a level 3 blockquote.
+>>>This is a level 1 blockquote.
+>>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>This is a level 1 blockquote.
+>>This is a level 2 blockquote.
+>>>This is a level 3 blockquote.
         """), "<blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p></blockquote><blockquote><p>This is a level 1 blockquote.</p><p>This is a level 1 blockquote.</p><blockquote><p>This is a level 2 blockquote.</p><blockquote><p>This is a level 3 blockquote.</p></blockquote></blockquote></blockquote>")
 
     def test_should_not_be_affected(self):
@@ -172,14 +172,14 @@ class CodeTest(unittest.TestCase):
                          "<code>![This](would be an image if it wasn't denoted as code.)</code>")
 
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     `This is some text denoted as code with 5 extra leading spaces.`"),
-                         "<code>This is some text denoted as code with 5 extra leading spaces.</code>")
-        self.assertEqual(CONVERT("     This is a `word` denoted as code with 5 extra leading spaces."),
-                         "<p>This is a <code>word</code> denoted as code with 5 extra leading spaces.</p>")
-        self.assertEqual(CONVERT("     These are some letters denoted as `c`o`d`e with 5 extra leading spaces."),
-                         "<p>These are some letters denoted as <code>c</code>o<code>d</code>e with 5 extra leading spaces.</p>")
-        self.assertEqual(CONVERT("     ``This is some code containing `backticks` with 5 extra leading spaces.``"),
-                         "<code>This is some code containing `backticks` with 5 extra leading spaces.</code>")
+        self.assertEqual(CONVERT("   `This is some text denoted as code with 3 extra leading spaces.`"),
+                         "<code>This is some text denoted as code with 3 extra leading spaces.</code>")
+        self.assertEqual(CONVERT("   This is a `word` denoted as code with 3 extra leading spaces."),
+                         "<p>This is a <code>word</code> denoted as code with 3 extra leading spaces.</p>")
+        self.assertEqual(CONVERT("   These are some letters denoted as `c`o`d`e with 3 extra leading spaces."),
+                         "<p>These are some letters denoted as <code>c</code>o<code>d</code>e with 3 extra leading spaces.</p>")
+        self.assertEqual(CONVERT("   ``This is some code containing `backticks` with 3 extra leading spaces.``"),
+                         "<code>This is some code containing `backticks` with 3 extra leading spaces.</code>")
 
     def test_extra_trailing_space(self):
         self.assertEqual(CONVERT("`This is some text denoted as code with 5 extra trailing spaces.`     "),
@@ -556,12 +556,12 @@ class HeadingTest(unittest.TestCase):
                          "<h2>This is a level 2 heading with 2 extra leading spaces.</h2>")
         self.assertEqual(CONVERT("   ### This is a level 3 heading with 3 extra leading spaces."),
                          "<h3>This is a level 3 heading with 3 extra leading spaces.</h3>")
-        self.assertEqual(CONVERT("    #### This is a level 4 heading with 4 extra leading spaces."),
-                         "<h4>This is a level 4 heading with 4 extra leading spaces.</h4>")
-        self.assertEqual(CONVERT("     ##### This is a level 5 heading with 5 extra leading spaces."),
-                         "<h5>This is a level 5 heading with 5 extra leading spaces.</h5>")
-        self.assertEqual(CONVERT("      ###### This is a level 6 heading with 6 extra leading spaces."),
-                         "<h6>This is a level 6 heading with 6 extra leading spaces.</h6>")
+        self.assertEqual(CONVERT("   #### This is a level 4 heading with 3 extra leading spaces."),
+                         "<h4>This is a level 4 heading with 3 extra leading spaces.</h4>")
+        self.assertEqual(CONVERT("   ##### This is a level 5 heading with 3 extra leading spaces."),
+                         "<h5>This is a level 5 heading with 3 extra leading spaces.</h5>")
+        self.assertEqual(CONVERT("   ###### This is a level 6 heading with 3 extra leading spaces."),
+                         "<h6>This is a level 6 heading with 3 extra leading spaces.</h6>")
 
     def test_extra_trailing_space(self):
         self.assertEqual(CONVERT("# This is a level 1 heading with an extra trailing space. "),
@@ -876,12 +876,12 @@ class OrderedListTest(unittest.TestCase):
                          "<ol><li>This is an ordered list item.</li></ol>")
 
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     1. This an ordered list item with 5 extra leading spaces."),
-                         "<ol><li>This an ordered list item with 5 extra leading spaces.</li></ol>")
-        self.assertEqual(CONVERT("      20. This an ordered list item with 5 extra leading spaces."),
-                         "<ol><li>This an ordered list item with 5 extra leading spaces.</li></ol>")
-        self.assertEqual(CONVERT("       300. This an ordered list item with 5 extra leading spaces."),
-                         "<ol><li>This an ordered list item with 5 extra leading spaces.</li></ol>")
+        self.assertEqual(CONVERT("   1. This an ordered list item with 3 extra leading spaces."),
+                         "<ol><li>This an ordered list item with 3 extra leading spaces.</li></ol>")
+        self.assertEqual(CONVERT("   20. This an ordered list item with 3 extra leading spaces."),
+                         "<ol><li>This an ordered list item with 3 extra leading spaces.</li></ol>")
+        self.assertEqual(CONVERT("   300. This an ordered list item with 3 extra leading spaces."),
+                         "<ol><li>This an ordered list item with 3 extra leading spaces.</li></ol>")
 
     def test_extra_trailing_space(self):
         self.assertEqual(CONVERT("1. This an ordered list item with 5 extra trailing spaces.     "),
@@ -905,9 +905,9 @@ class OrderedListTest(unittest.TestCase):
                                     3. This is a level 2 ordered list item."""), "<ol><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li></ol></ol>")
 
         self.assertEqual(CONVERT("""
-        8. This is a level 1 ordered list item.
-        2. This is a level 1 ordered list item.
-        4. This is a level 1 ordered list item.
+8. This is a level 1 ordered list item.
+2. This is a level 1 ordered list item.
+4. This is a level 1 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li></ol>")
 
         self.assertEqual(CONVERT("""
@@ -917,80 +917,80 @@ class OrderedListTest(unittest.TestCase):
         """), "<ol><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
 
         self.assertEqual(CONVERT("""
-        1. This is a level 1 ordered list item.
-         2. This is a level 2 ordered list item.
-          3. This is a level 3 ordered list item.
+   1. This is a level 1 ordered list item.
+    2. This is a level 2 ordered list item.
+     3. This is a level 3 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
 
         self.assertEqual(CONVERT("""
-        16. This is a level 1 ordered list item.
-            8. This is a level 2 ordered list item.
-                4. This is a level 3 ordered list item.
+16. This is a level 1 ordered list item.
+    8. This is a level 2 ordered list item.
+        4. This is a level 3 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
 
         self.assertEqual(CONVERT("""
-            1. This is a level 1 ordered list item.
-            2. This is a level 1 ordered list item.
-                               1. This is a level 2 ordered list item.
-            3. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+2. This is a level 1 ordered list item.
+                   1. This is a level 2 ordered list item.
+3. This is a level 1 ordered list item.
             """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li></ol><li>This is a level 1 ordered list item.</li></ol>")
 
         self.assertEqual(CONVERT("""
-        1. This is a level 1 ordered list item.
-        2. This is a level 1 ordered list item.
-        3. This is a level 1 ordered list item.
-         1. This is a level 2 ordered list item.
-         2. This is a level 2 ordered list item.
-          3. This is a level 3 ordered list item.
+1. This is a level 1 ordered list item.
+2. This is a level 1 ordered list item.
+3. This is a level 1 ordered list item.
+ 1. This is a level 2 ordered list item.
+ 2. This is a level 2 ordered list item.
+  3. This is a level 3 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
 
         self.assertEqual(CONVERT("""
-        1) This is a level 1 ordered list item.
-        2) This is a level 1 ordered list item.
-        3) This is a level 1 ordered list item.
-         1) This is a level 2 ordered list item.
-         2) This is a level 2 ordered list item.
-          3) This is a level 3 ordered list item.
+1) This is a level 1 ordered list item.
+2) This is a level 1 ordered list item.
+3) This is a level 1 ordered list item.
+ 1) This is a level 2 ordered list item.
+ 2) This is a level 2 ordered list item.
+  3) This is a level 3 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol></ol></ol>")
 
         self.assertEqual(CONVERT("""
-        1. This is a level 1 ordered list item.
-        1. This is a level 1 ordered list item.
-        1. This is a level 1 ordered list item.
-         2. This is a level 2 ordered list item.
-         2. This is a level 2 ordered list item.
-          3. This is a level 3 ordered list item.
-         2. This is a level 2 ordered list item.
-         2. This is a level 2 ordered list item.
-        1. This is a level 1 ordered list item.
-        1. This is a level 1 ordered list item.
-        1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+ 2. This is a level 2 ordered list item.
+ 2. This is a level 2 ordered list item.
+  3. This is a level 3 ordered list item.
+ 2. This is a level 2 ordered list item.
+ 2. This is a level 2 ordered list item.
+1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li></ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li></ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li></ol>")
 
         self.assertEqual(CONVERT("""
-        1. This is a level 1 ordered list item.
-        2. This is a level 1 ordered list item.
-        3. This is a level 1 ordered list item.
-         1. This is a level 2 ordered list item.
-         2. This is a level 2 ordered list item.
-          1. This is a level 3 ordered list item.
-           1. This is a level 4 ordered list item.
-        4. This is a level 1 ordered list item.
+1. This is a level 1 ordered list item.
+2. This is a level 1 ordered list item.
+3. This is a level 1 ordered list item.
+ 1. This is a level 2 ordered list item.
+ 2. This is a level 2 ordered list item.
+  1. This is a level 3 ordered list item.
+   1. This is a level 4 ordered list item.
+4. This is a level 1 ordered list item.
         """), "<ol><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><li>This is a level 1 ordered list item.</li><ol><li>This is a level 2 ordered list item.</li><li>This is a level 2 ordered list item.</li><ol><li>This is a level 3 ordered list item.</li><ol><li>This is a level 4 ordered list item.</li></ol></ol></ol><li>This is a level 1 ordered list item.</li></ol>")
 
         self.assertEqual(CONVERT("""
-          1. This is a level 1 list item.
-         1. This is a level 1 list item.
-        1. This is a level 1 list item.
+  1. This is a level 1 list item.
+ 1. This is a level 1 list item.
+1. This is a level 1 list item.
         """), "<ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li></ol>")
 
         self.assertEqual(CONVERT("""
-          1. This is a level 1 list item.
-         1. This is a level 1 list item.
-        1. This is a level 1 list item.
-        1. This is a level 1 list item.
-         2. This is a level 2 list item.
-          3. This is a level 3 list item.
+  1. This is a level 1 list item.
+ 1. This is a level 1 list item.
+1. This is a level 1 list item.
+1. This is a level 1 list item.
+ 2. This is a level 2 list item.
+  3. This is a level 3 list item.
         """), "<ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li></ol><ol><li>This is a level 1 list item.</li><li>This is a level 1 list item.</li><ol><li>This is a level 2 list item.</li><ol><li>This is a level 3 list item.</li></ol></ol></ol>")
 
     def test_should_not_be_affected(self):
@@ -1016,16 +1016,16 @@ class ParagraphTest(unittest.TestCase):
                          "<p>This is a paragraph followed by a line break.</p><br><p>This is another paragraph.</p>")
 
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     This is a paragraph with 5 extra leading spaces."),
-                         "<p>This is a paragraph with 5 extra leading spaces.</p>")
+        self.assertEqual(CONVERT("   This is a paragraph with 3 extra leading spaces."),
+                         "<p>This is a paragraph with 3 extra leading spaces.</p>")
 
     def test_extra_trailing_space(self):
         self.assertEqual(CONVERT("This is a paragraph with 5 extra trailing spaces.     "),
                          "<p>This is a paragraph with 5 extra trailing spaces.</p><br>")
 
     def test_extra_space(self):
-        self.assertEqual(CONVERT("     This is a paragraph with 5 extra spaces.     "),
-                         "<p>This is a paragraph with 5 extra spaces.</p><br>")
+        self.assertEqual(CONVERT("   This is a paragraph with 3 extra spaces.   "),
+                         "<p>This is a paragraph with 3 extra spaces.</p><br>")
 
     def test_multiline(self):
         self.assertEqual(CONVERT("This \nis \na \nmultiline \nparagraph."),
@@ -1040,11 +1040,11 @@ paragraph.
         """), "<p>This is a multiline paragraph.</p>")
 
         self.assertEqual(CONVERT("""
-            This
-            is
-            a
-            multiline
-            paragraph.
+   This
+   is
+   a
+   multiline
+   paragraph.
             """), "<p>This is a multiline paragraph.</p>")
 
         self.assertEqual(CONVERT("This is a multiline paragraph.  \nIt has a line break."),
@@ -1066,12 +1066,12 @@ class UnorderedListTest(unittest.TestCase):
                          "<ul><li>This is an unordered list item.</li></ul>")
 
     def test_extra_leading_space(self):
-        self.assertEqual(CONVERT("     - This an unordered list item with 5 extra leading spaces."),
-                         "<ul><li>This an unordered list item with 5 extra leading spaces.</li></ul>")
-        self.assertEqual(CONVERT("      - This an unordered list item with 5 extra leading spaces."),
-                         "<ul><li>This an unordered list item with 5 extra leading spaces.</li></ul>")
-        self.assertEqual(CONVERT("       - This an unordered list item with 5 extra leading spaces."),
-                         "<ul><li>This an unordered list item with 5 extra leading spaces.</li></ul>")
+        self.assertEqual(CONVERT(" - This an unordered list item with an extra leading space."),
+                         "<ul><li>This an unordered list item with an extra leading space.</li></ul>")
+        self.assertEqual(CONVERT("  - This an unordered list item with 2 extra leading spaces."),
+                         "<ul><li>This an unordered list item with 2 extra leading spaces.</li></ul>")
+        self.assertEqual(CONVERT("   - This an unordered list item with 3 extra leading spaces."),
+                         "<ul><li>This an unordered list item with 3 extra leading spaces.</li></ul>")
 
     def test_extra_trailing_space(self):
         self.assertEqual(CONVERT("- This an unordered list item with 5 extra trailing spaces.     "),
@@ -1091,19 +1091,19 @@ class UnorderedListTest(unittest.TestCase):
 
     def test_multiline(self):
         self.assertEqual(CONVERT("""- This is a level 1 unordered list item.
-                                    - This is a level 1 unordered list item.
-                                    - This is a level 1 unordered list item."""), "<ul><li>This is a level 1 unordered list item.</li><ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul></ul>")
+                                    - This is a level 2 unordered list item.
+                                    - This is a level 2 unordered list item."""), "<ul><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li></ul></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul>")
 
         self.assertEqual(CONVERT("""
-        ----- This is a level 1 unordered list item item.
-        ----- This is a level 1 unordered list item item.
-        ----- This is a level 1 unordered list item item.
+----- This is a level 1 unordered list item item.
+----- This is a level 1 unordered list item item.
+----- This is a level 1 unordered list item item.
         """), "<ul><li>This is a level 1 unordered list item item.</li><li>This is a level 1 unordered list item item.</li><li>This is a level 1 unordered list item item.</li></ul>")
 
         self.assertEqual(CONVERT("""
@@ -1113,94 +1113,94 @@ class UnorderedListTest(unittest.TestCase):
         """), "<ul><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul></ul></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-         - This is a level 2 unordered list item.
-          - This is a level 3 unordered list item.
+- This is a level 1 unordered list item.
+ - This is a level 2 unordered list item.
+  - This is a level 3 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul></ul></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-            - This is a level 2 unordered list item.
-                - This is a level 3 unordered list item.
+- This is a level 1 unordered list item.
+    - This is a level 2 unordered list item.
+        - This is a level 3 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul></ul></ul>")
 
         self.assertEqual(CONVERT("""
-            - This is a level 1 unordered list item.
-            - This is a level 1 unordered list item.
-                               - This is a level 2 unordered list item.
-            - This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+                   - This is a level 2 unordered list item.
+- This is a level 1 unordered list item.
             """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li></ul><li>This is a level 1 unordered list item.</li></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-         - This is a level 2 unordered list item.
-         - This is a level 2 unordered list item.
-          - This is a level 3 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+ - This is a level 2 unordered list item.
+ - This is a level 2 unordered list item.
+  - This is a level 3 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul></ul></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-        * This is a level 1 unordered list item.
-        + This is a level 1 unordered list item.
-         - This is a level 2 unordered list item.
-         * This is a level 2 unordered list item.
-          + This is a level 3 unordered list item.
+- This is a level 1 unordered list item.
+* This is a level 1 unordered list item.
++ This is a level 1 unordered list item.
+ - This is a level 2 unordered list item.
+ * This is a level 2 unordered list item.
+  + This is a level 3 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul></ul></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-         - This is a level 2 unordered list item.
-         - This is a level 2 unordered list item.
-          - This is a level 3 unordered list item.
-         - This is a level 2 unordered list item.
-         - This is a level 2 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+ - This is a level 2 unordered list item.
+ - This is a level 2 unordered list item.
+  - This is a level 3 unordered list item.
+ - This is a level 2 unordered list item.
+ - This is a level 2 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li></ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-         * This is a level 2 unordered list item.
-         * This is a level 2 unordered list item.
-          + This is a level 3 unordered list item.
-         * This is a level 2 unordered list item.
-         * This is a level 2 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+ * This is a level 2 unordered list item.
+ * This is a level 2 unordered list item.
+  + This is a level 3 unordered list item.
+ * This is a level 2 unordered list item.
+ * This is a level 2 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li></ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li></ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li></ul>")
 
         self.assertEqual(CONVERT("""
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-        - This is a level 1 unordered list item.
-         - This is a level 2 unordered list item.
-         - This is a level 2 unordered list item.
-          - This is a level 3 unordered list item.
-           - This is a level 4 unordered list item.
-        - This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+- This is a level 1 unordered list item.
+ - This is a level 2 unordered list item.
+ - This is a level 2 unordered list item.
+  - This is a level 3 unordered list item.
+   - This is a level 4 unordered list item.
+- This is a level 1 unordered list item.
         """), "<ul><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><li>This is a level 1 unordered list item.</li><ul><li>This is a level 2 unordered list item.</li><li>This is a level 2 unordered list item.</li><ul><li>This is a level 3 unordered list item.</li><ul><li>This is a level 4 unordered list item.</li></ul></ul></ul><li>This is a level 1 unordered list item.</li></ul>")
 
         self.assertEqual(CONVERT("""
-          - This is a level 1 list item.
-         - This is a level 1 list item.
-        - This is a level 1 list item.
+  - This is a level 1 list item.
+ - This is a level 1 list item.
+- This is a level 1 list item.
         """), "<ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li></ul>")
 
         self.assertEqual(CONVERT("""
-          - This is a level 1 list item.
-         - This is a level 1 list item.
-        - This is a level 1 list item.
-        - This is a level 1 list item.
-         - This is a level 2 list item.
-          - This is a level 3 list item.
+  - This is a level 1 list item.
+ - This is a level 1 list item.
+- This is a level 1 list item.
+- This is a level 1 list item.
+ - This is a level 2 list item.
+  - This is a level 3 list item.
         """), "<ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li></ul><ul><li>This is a level 1 list item.</li><li>This is a level 1 list item.</li><ul><li>This is a level 2 list item.</li><ul><li>This is a level 3 list item.</li></ul></ul></ul>")
 
     def test_should_not_be_affected(self):

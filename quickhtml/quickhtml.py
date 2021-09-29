@@ -255,6 +255,7 @@ def check_paragraph(line):
         "<blockquote": r"""<blockquote>.+""",
         "<ol": r"""<ol>.+""",
         "<ul": r"""<ul>.+""",
+        "<pre": r"""<pre><code>.+""",
     }
 
     for tag, pattern in INDEPENDENT_TAGS.items():
@@ -533,6 +534,7 @@ def convert(string):
     new_string = ""
     add_line_break = False
     open_paragraph = False
+    open_code_block = False
 
     def convert_paragraph(line):
         """
@@ -551,80 +553,103 @@ def convert(string):
             return f"<p>{line}"
         return line
 
-    # Ensure string ends with a newline to prevents inconsistencies.
+    # Ensure string ends with a newline to prevent inconsistencies.
     while string.splitlines()[-1] != "":
         string += "\n"
 
     for line in string.splitlines():
+        # Ensure line made out of only whitespaces is an empty string, as to
+        # prevent inconsistencies.
+        if line.strip() == "":
+            line = ""
+
         new_line = ""
 
         # Add horizontal rules.
         line = REGEX_HORIZONTAL_RULE.sub("<hr>", line)
 
-        # Add headings.
-        if REGEX_HEADING.search(line):
-            level = len(REGEX_HEADING.search(line)[2])
-            line = REGEX_HEADING.sub(f"\\1<h{level}>\\3</h{level}>\\4", line)
+        # Add code blocks.
+        if line.startswith("    ") and not open_tags:
+            # If a code block is already open, a newline should be added, as to
+            # ensure text is formatted as it was in the input string.
+            new_line += "<pre><code>" if not open_code_block else "\n"
 
-        # Store information about code blocks.
-        code_blocks = []
-        if REGEX_CODE.search(line):
-            matches = ("".join(i or "") for i in REGEX_CODE.findall(line))
-            right = REGEX_CODE.sub("\\1\\2", line)
-            for match in matches:
-                left, right = right.split(match, 1)
-                code_blocks.append(
-                    {"left": left, "content": match, "right": right})
+            # 4 characters are removed from the start of the line to account
+            # for spaces used to denote a code block.
+            new_line += line[4:]
+            open_code_block = True
+        elif open_code_block:
+            new_line = "</code></pre>"
+            open_code_block = False
 
-        # Add code and inline tags.
-        if code_blocks:
-            line = ""
-            for block in code_blocks:
-                left = add_inline_tags(block["left"])
-                line += left + f"<code>{block['content']}</code>"
-                if block == code_blocks[-1]:
-                    line += add_inline_tags(block["right"])
-        else:
-            line = add_inline_tags(line)
+        # Convert string only if a code block is not open.
+        if not open_code_block:
+            # Add headings.
+            if REGEX_HEADING.search(line):
+                level = len(REGEX_HEADING.search(line)[2])
+                line = REGEX_HEADING.sub(
+                    f"\\1<h{level}>\\3</h{level}>\\4", line)
 
-        # Check if line contains nested tags, if so, open tags.
-        if any(tag["regex"].fullmatch(line) for tag in NESTED_TAGS):
-            for tag in NESTED_TAGS:
-                if tag["regex"].fullmatch(line):
-                    new_line = convert_nested_tag(line, tag, open_tags)
+            # Store information about code snippets.
+            code_snippets = []
+            if REGEX_CODE.search(line):
+                matches = ("".join(i or "") for i in REGEX_CODE.findall(line))
+                right = REGEX_CODE.sub("\\1\\2", line)
+                for match in matches:
+                    left, right = right.split(match, 1)
+                    code_snippets.append(
+                        {"left": left, "content": match, "right": right})
 
-        # If not, check if there are open tags, if so, close them. After doing
-        # so, check whether the line is a paragraph and add it accordingly.
-        elif open_tags:
-            for tag in reversed(open_tags):
-                new_line += tag[0]["outer_closing_tag"]
-                open_tags.remove(tag)
-            if check_paragraph(line):
+            # Add code snippets and inline tags.
+            if code_snippets:
+                line = ""
+                for block in code_snippets:
+                    left = add_inline_tags(block["left"])
+                    line += left + f"<code>{block['content']}</code>"
+                    if block == code_snippets[-1]:
+                        line += add_inline_tags(block["right"])
+            else:
+                line = add_inline_tags(line)
+
+            # Check if line contains nested tags, if so, open tags.
+            if any(tag["regex"].fullmatch(line) for tag in NESTED_TAGS):
+                for tag in NESTED_TAGS:
+                    if tag["regex"].fullmatch(line):
+                        new_line += convert_nested_tag(line, tag, open_tags)
+
+            # If not, check if there are open tags, if so, close them. After
+            # doing so, check whether the line is a paragraph and add it
+            # accordingly.
+            elif open_tags:
+                for tag in reversed(open_tags):
+                    new_line += tag[0]["outer_closing_tag"]
+                    open_tags.remove(tag)
+                if check_paragraph(line):
+                    new_line += convert_paragraph(line)
+                else:
+                    new_line += line
+
+            # If not, check if line is a paragraph, if so, open a paragraph.
+            elif check_paragraph(line):
                 new_line += convert_paragraph(line)
+
+            # If not, just add the line as it is.
             else:
                 new_line += line
 
-        # If not, check if line is a paragraph, if so, open a paragraph.
-        elif check_paragraph(line):
-            new_line += convert_paragraph(line)
+            # Escape characters.
+            if REGEX_ESCAPED_CHARACTER.search(new_line):
+                new_line = REGEX_ESCAPED_CHARACTER.sub("\\1", new_line)
 
-        # If not, just add the line as it is.
-        else:
-            new_line += line
+            # Add line breaks.
+            if add_line_break:
+                new_line = f"<br>{new_line}"
+                add_line_break = False
 
-        # Escape characters.
-        if REGEX_ESCAPED_CHARACTER.search(new_line):
-            new_line = REGEX_ESCAPED_CHARACTER.sub("\\1", new_line)
-
-        # Add line breaks.
-        if add_line_break:
-            new_line = f"<br>{new_line}"
-            add_line_break = False
-
-        # Check if a line break should be added.
-        if line.lstrip().endswith("  "):
-            new_line = new_line.rstrip()
-            add_line_break = True
+            # Check if a line break should be added.
+            if line.lstrip().endswith("  "):
+                new_line = new_line.rstrip()
+                add_line_break = True
 
         # Close paragraph.
         if open_paragraph and not check_paragraph(new_line):
