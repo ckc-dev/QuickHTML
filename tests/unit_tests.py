@@ -147,6 +147,56 @@ class BlockquoteTest(unittest.TestCase):
                          "<p>This > should > not > be > affected.</p>")
 
 
+class CodeBlockTest(unittest.TestCase):
+    def test_code_block(self):
+        self.assertEqual(CONVERT("    This is some text inside a code block."),
+                         "<pre><code>This is some text inside a code block.</code></pre>")
+
+    def test_ignore_inline_tags(self):
+        self.assertEqual(CONVERT("    These _are_ some *words* that _would_ be *in* italics _if_ they *weren't* inside _a_ code *block*."),
+                         "<pre><code>These _are_ some *words* that _would_ be *in* italics _if_ they *weren't* inside _a_ code *block*.</code></pre>")
+        self.assertEqual(CONVERT("    These __are__ some **words** that __would__ be **in** bold __if__ they **weren't** inside __a__ code **block**."),
+                         "<pre><code>These __are__ some **words** that __would__ be **in** bold __if__ they **weren't** inside __a__ code **block**.</code></pre>")
+        self.assertEqual(CONVERT("    [This](would be a link if it wasn't inside a code block.)"),
+                         "<pre><code>[This](would be a link if it wasn't inside a code block.)</code></pre>")
+        self.assertEqual(CONVERT("    ![This](would be an image if it wasn't inside a code block.)"),
+                         "<pre><code>![This](would be an image if it wasn't inside a code block.)</code></pre>")
+
+    def test_extra_leading_space(self):
+        self.assertEqual(CONVERT("     This is some text inside a code block with an extra leading space."),
+                         "<pre><code> This is some text inside a code block with an extra leading space.</code></pre>")
+        self.assertEqual(CONVERT("      This is some text inside a code block with 2 extra leading spaces."),
+                         "<pre><code>  This is some text inside a code block with 2 extra leading spaces.</code></pre>")
+        self.assertEqual(CONVERT("       This is some text inside a code block with 3 extra leading spaces."),
+                         "<pre><code>   This is some text inside a code block with 3 extra leading spaces.</code></pre>")
+
+    def test_extra_trailing_space(self):
+        self.assertEqual(CONVERT("    This is some text inside a code block with an extra trailing space. "),
+                         "<pre><code>This is some text inside a code block with an extra trailing space. </code></pre>")
+        self.assertEqual(CONVERT("    This is some text inside a code block with 2 extra trailing spaces.  "),
+                         "<pre><code>This is some text inside a code block with 2 extra trailing spaces.  </code></pre>")
+        self.assertEqual(CONVERT("    This is some text inside a code block with 3 extra trailing spaces.   "),
+                         "<pre><code>This is some text inside a code block with 3 extra trailing spaces.   </code></pre>")
+
+    def test_extra_space(self):
+        self.assertEqual(CONVERT("     This is some text inside a code block with an extra space. "),
+                         "<pre><code> This is some text inside a code block with an extra space. </code></pre>")
+        self.assertEqual(CONVERT("      This is some text inside a code block with 2 extra spaces.  "),
+                         "<pre><code>  This is some text inside a code block with 2 extra spaces.  </code></pre>")
+        self.assertEqual(CONVERT("       This is some text inside a code block with 3 extra spaces.   "),
+                         "<pre><code>   This is some text inside a code block with 3 extra spaces.   </code></pre>")
+
+    def test_should_not_be_affected(self):
+        self.assertEqual(CONVERT(" This should not be affected."),
+                         "<p>This should not be affected.</p>")
+        self.assertEqual(CONVERT("  This should not be affected."),
+                         "<p>This should not be affected.</p>")
+        self.assertEqual(CONVERT("   This should not be affected."),
+                         "<p>This should not be affected.</p>")
+        self.assertEqual(CONVERT("This should not be affected.    "),
+                         "<p>This should not be affected.</p><br>")
+
+
 class CodeTest(unittest.TestCase):
     def test_empty_code(self):
         self.assertEqual(CONVERT("``"), "<p>``</p>")
