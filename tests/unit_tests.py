@@ -667,6 +667,37 @@ class HeadingTest(unittest.TestCase):
         self.assertEqual(CONVERT("This # should ## not ### be #### affected. ##### ######"),
                          "<p>This # should ## not ### be #### affected. ##### ######</p>")
 
+    def test_alternate_syntax(self):
+        self.assertEqual(CONVERT("""
+This is a level 1 heading.
+==
+"""), "<h1>This is a level 1 heading.</h1>")
+
+        self.assertEqual(CONVERT("""
+This is a level 1 heading.
+=====
+"""), "<h1>This is a level 1 heading.</h1>")
+
+        self.assertEqual(CONVERT("""
+     This is a level 1 heading with 5 extra leading spaces.
+     ==
+"""), "<h1>This is a level 1 heading with 5 extra leading spaces.</h1>")
+
+        self.assertEqual(CONVERT("""
+This is a level 2 heading.
+--
+"""), "<h2>This is a level 2 heading.</h2>")
+
+        self.assertEqual(CONVERT("""
+This is a level 2 heading.
+-----
+"""), "<h2>This is a level 2 heading.</h2>")
+
+        self.assertEqual(CONVERT("""
+     This is a level 2 heading with 5 extra leading spaces.
+     --
+"""), "<h2>This is a level 2 heading with 5 extra leading spaces.</h2>")
+
 
 class HorizontalSeparatorTest(unittest.TestCase):
     def test_underscore(self):
