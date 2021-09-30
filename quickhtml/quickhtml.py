@@ -71,6 +71,24 @@ REGEX_HEADING = re.compile(r"""
                                 # whitespaces.
     $                           # Match line end.""", re.VERBOSE)
 
+REGEX_HEADING__ALTERNATIVE_LEVEL_1 = re.compile(r"""
+    (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+            # times as possible.
+    \n      # Match a newline.
+    \s*     # Match between 1 and ∞ whitespaces.
+    ={2,}   # Match "=" between 2 and ∞ times.
+    $       # Match line end.
+""", re.VERBOSE | re.MULTILINE)
+
+REGEX_HEADING__ALTERNATIVE_LEVEL_2 = re.compile(r"""
+    (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+            # times as possible.
+    \n      # Match a newline.
+    \s*     # Match between 1 and ∞ whitespaces.
+    -{2,}   # Match "-" between 2 and ∞ times.
+    $       # Match line end.
+""", re.VERBOSE | re.MULTILINE)
+
 REGEX_HORIZONTAL_RULE = re.compile(r"""
     ^               # Match line start.
     \s*             # Match between 0 and ∞ whitespaces.
@@ -504,16 +522,11 @@ def add_inline_tags(line):
 
     # Add quick email links.
     if REGEX_QUICK_EMAIL.search(line):
-        match = REGEX_QUICK_EMAIL.search(line)
-        address = match.group(1)
-        line = REGEX_QUICK_EMAIL.sub(
-            f'<a href="mailto:{address}">{address}</a>', line)
+        line = REGEX_QUICK_EMAIL.sub(f'<a href="mailto:\\1">\\1</a>', line)
 
     # Add quick links.
     if REGEX_QUICK_LINK.search(line):
-        match = REGEX_QUICK_LINK.search(line)
-        address = match.group(1)
-        line = REGEX_QUICK_LINK.sub(f'<a href="{address}">{address}</a>', line)
+        line = REGEX_QUICK_LINK.sub(f'<a href="\\1">\\1</a>', line)
     return line
 
 
@@ -529,6 +542,10 @@ def convert(string):
     """
     if string.strip() == "":
         return ""
+
+    # Convert alternate-style headings.
+    string = REGEX_HEADING__ALTERNATIVE_LEVEL_1.sub("# \\1", string)
+    string = REGEX_HEADING__ALTERNATIVE_LEVEL_2.sub("## \\1", string)
 
     open_tags = []
     new_string = ""
