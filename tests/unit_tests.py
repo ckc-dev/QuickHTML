@@ -566,6 +566,14 @@ class EscapedCharacters(unittest.TestCase):
         self.assertEqual(CONVERT("\\300. This should not be affected."),
                          "<p>300. This should not be affected.</p>")
 
+    def test_quick_email(self):
+        self.assertEqual(CONVERT("\<email@domain.example>"),
+                         "<p><email@domain.example></p>")
+
+    def test_quick_link(self):
+        self.assertEqual(CONVERT("\<http://example.http.link>"),
+                         "<p><http://example.http.link></p>")
+
     def test_unordered_list(self):
         self.assertEqual(CONVERT("\- This should not be affected."),
                          "<p>- This should not be affected.</p>")
