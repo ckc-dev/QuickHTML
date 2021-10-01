@@ -173,6 +173,7 @@ REGEX_ORDERED_LIST = re.compile(r"""
     \s*     # Match between 0 and ∞ whitespaces.""", re.VERBOSE)
 
 REGEX_QUICK_EMAIL = re.compile(r"""
+    (?<!\\)         # Ensure there's no escaping backslash.
     <               # Match "<" once.
     (               # CAPTURE GROUP (1) | Open capture group.
         [\w\d_.+-]+ # Match either a word character, a digit, "_", ".", "+", or
@@ -187,6 +188,7 @@ REGEX_QUICK_EMAIL = re.compile(r"""
     >               # Match ">" once.""", re.VERBOSE)
 
 REGEX_QUICK_LINK = re.compile(r"""
+    (?<!\\)             # Ensure there's no escaping backslash.
     <                   # Match "<" once.
     (                   # CAPTURE GROUP (1) | Open capture group.
         https?          # Match either "http" or "https".
@@ -543,7 +545,7 @@ def convert(string):
     if string.strip() == "":
         return ""
 
-    # Convert alternate-style headings.
+    # Convert alternate-style headings to conventional style.
     string = REGEX_HEADING__ALTERNATIVE_LEVEL_1.sub("# \\1", string)
     string = REGEX_HEADING__ALTERNATIVE_LEVEL_2.sub("## \\1", string)
 
