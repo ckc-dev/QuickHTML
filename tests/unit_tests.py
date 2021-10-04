@@ -558,6 +558,247 @@ class EscapedCharacters(unittest.TestCase):
         self.assertEqual(CONVERT("\[This should not be affected.](Not a link. \"Not a title.\")"),
                          "<p>[This should not be affected.](Not a link. \"Not a title.\")</p>")
 
+    def test_reference_link(self):
+        self.assertEqual(CONVERT("""
+\[1]:Link URL.
+[1]
+        """), "<p>[1]:Link URL. [1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL.
+[This is a link.][1]
+        """), "<p>[1]:Link URL. [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. "This is a title."
+[1]
+        """), "<p>[1]:Link URL. \"This is a title.\" [1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. "This is a title."
+[This is a link.][1]
+        """), "<p>[1]:Link URL. \"This is a title.\" [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. 'This is a title.'
+[This is a link.][1]
+        """), "<p>[1]:Link URL. 'This is a title.' [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. (This is a title.)
+[This is a link.][1]
+        """), "<p>[1]:Link URL. (This is a title.) [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:<Link URL.> "This is a title."
+[This is a link.][1]
+        """), "<p>[1]:<Link URL.> \"This is a title.\" [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:<Link URL.> 'This is a title.'
+[This is a link.][1]
+        """), "<p>[1]:<Link URL.> 'This is a title.' [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:<Link URL.> (This is a title.)
+[This is a link.][1]
+        """), "<p>[1]:<Link URL.> (This is a title.) [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.
+[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL. [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.     "     This is a title.     "
+[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL.     \"     This is a title.     \" [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.     '     This is a title.     '
+[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL.     '     This is a title.     ' [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.     (     This is a title.     )
+[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL.     (     This is a title.     ) [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     <     Link URL.     >     "     This is a title.     "
+[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     <     Link URL.     >     \"     This is a title.     \" [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     <     Link URL.     >     '     This is a title.     '
+[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     <     Link URL.     >     '     This is a title.     ' [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     <     Link URL.     >     (     This is a title.     )
+[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     <     Link URL.     >     (     This is a title.     ) [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL.
+\[1]
+        """), "<p>[1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL.
+\[This is a link.]\[1]
+        """), "<p>[This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. "This is a title."
+\[1]
+        """), "<p>[1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. "This is a title."
+\[This is a link.]\[1]
+        """), "<p>[This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. 'This is a title.'
+\[This is a link.]\[1]
+        """), "<p>[This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. (This is a title.)
+\[This is a link.]\[1]
+        """), "<p>[This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:<Link URL.> "This is a title."
+\[This is a link.]\[1]
+        """), "<p>[This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:<Link URL.> 'This is a title.'
+\[This is a link.]\[1]
+        """), "<p>[This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+[1]:<Link URL.> (This is a title.)
+\[This is a link.]\[1]
+        """), "<p>[This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.
+\[     This is a link.     ]     \[     1     ]
+        """), "<p>[     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.     "     This is a title.     "
+\[     This is a link.     ]     \[     1     ]
+        """), "<p>[     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.     '     This is a title.     '
+\[     This is a link.     ]     \[     1     ]
+        """), "<p>[     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.     (     This is a title.     )
+\[     This is a link.     ]     \[     1     ]
+        """), "<p>[     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     <     Link URL.     >     "     This is a title.     "
+\[     This is a link.     ]     \[     1     ]
+        """), "<p>[     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     <     Link URL.     >     '     This is a title.     '
+\[     This is a link.     ]     \[     1     ]
+        """), "<p>[     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     <     Link URL.     >     (     This is a title.     )
+\[     This is a link.     ]     \[     1     ]
+        """), "<p>[     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL.
+\[1]
+        """), "<p>[1]:Link URL. [1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL.
+\[This is a link.][1]
+        """), "<p>[1]:Link URL. [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. "This is a title."
+\[1]
+        """), "<p>[1]:Link URL. \"This is a title.\" [1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. "This is a title."
+\[This is a link.][1]
+        """), "<p>[1]:Link URL. \"This is a title.\" [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. 'This is a title.'
+\[This is a link.][1]
+        """), "<p>[1]:Link URL. 'This is a title.' [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:Link URL. (This is a title.)
+\[This is a link.][1]
+        """), "<p>[1]:Link URL. (This is a title.) [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:<Link URL.> "This is a title."
+\[This is a link.][1]
+        """), "<p>[1]:<Link URL.> \"This is a title.\" [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:<Link URL.> 'This is a title.'
+\[This is a link.][1]
+        """), "<p>[1]:<Link URL.> 'This is a title.' [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[1]:<Link URL.> (This is a title.)
+\[This is a link.][1]
+        """), "<p>[1]:<Link URL.> (This is a title.) [This is a link.][1]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.
+\[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL. [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.     "     This is a title.     "
+\[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL.     \"     This is a title.     \" [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.     '     This is a title.     '
+\[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL.     '     This is a title.     ' [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     Link URL.     (     This is a title.     )
+\[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     Link URL.     (     This is a title.     ) [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     <     Link URL.     >     "     This is a title.     "
+\[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     <     Link URL.     >     \"     This is a title.     \" [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     <     Link URL.     >     '     This is a title.     '
+\[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     <     Link URL.     >     '     This is a title.     ' [     This is a link.     ]     [     1     ]</p>")
+
+        self.assertEqual(CONVERT("""
+\[     1     ]     :     <     Link URL.     >     (     This is a title.     )
+\[     This is a link.     ]     [     1     ]
+        """), "<p>[     1     ]     :     <     Link URL.     >     (     This is a title.     ) [     This is a link.     ]     [     1     ]</p>")
+
     def test_ordered_list(self):
         self.assertEqual(CONVERT("\\1. This should not be affected."),
                          "<p>1. This should not be affected.</p>")
@@ -937,6 +1178,87 @@ class LinkTest(unittest.TestCase):
                          "<a href=\"mailto:email.containing.dots@domain.example\">email.containing.dots@domain.example</a>")
         self.assertEqual(CONVERT("<email+containing+plus+signs@domain.example>"),
                          "<a href=\"mailto:email+containing+plus+signs@domain.example\">email+containing+plus+signs@domain.example</a>")
+
+    def test_reference_link(self):
+        self.assertEqual(CONVERT("""
+[1]:Link URL.
+[1]
+        """), "<a href=\"Link URL.\">1</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL.
+[This is a link.][1]
+        """), "<a href=\"Link URL.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. "This is a title."
+[1]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">1</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. "This is a title."
+[This is a link.][1]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. 'This is a title.'
+[This is a link.][1]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:Link URL. (This is a title.)
+[This is a link.][1]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:<Link URL.> "This is a title."
+[This is a link.][1]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:<Link URL.> 'This is a title.'
+[This is a link.][1]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]:<Link URL.> (This is a title.)
+[This is a link.][1]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.
+[     This is a link.     ]     [     1     ]
+        """), "<a href=\"Link URL.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.     "     This is a title.     "
+[     This is a link.     ]     [     1     ]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.     '     This is a title.     '
+[     This is a link.     ]     [     1     ]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     Link URL.     (     This is a title.     )
+[     This is a link.     ]     [     1     ]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     <     Link URL.     >     "     This is a title.     "
+[     This is a link.     ]     [     1     ]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     <     Link URL.     >     '     This is a title.     '
+[     This is a link.     ]     [     1     ]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+        self.assertEqual(CONVERT("""
+[     1     ]     :     <     Link URL.     >     (     This is a title.     )
+[     This is a link.     ]     [     1     ]
+        """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
 
 
 class OrderedListTest(unittest.TestCase):
