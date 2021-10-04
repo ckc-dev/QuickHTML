@@ -162,6 +162,56 @@ REGEX_LINK = re.compile(r"""
     \s*         # Match between 0 and ∞ whitespaces.
     \)          # Match ")" once.""", re.VERBOSE)
 
+REGEX_REFERENCE_DEFINITION = re.compile(r"""
+    ^           # Match line start.
+    (?<!\\)     # Ensure there's no escaping backslash.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \[          # Match "[" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \]          # Match "]" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    :           # Match ":" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    <?          # Match "<" either 0 or 1 times.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    >?          # Match ">" either 0 or 1 times.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (?:         # Open non-capturing group.
+        [\"'(]  # Match '"', "'", or "(" once.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (.+?)   # CAPTURE GROUP (3) | Match between 1 and ∞ characters, as few
+                # times as possible.
+        \s*     # Match between 0 and ∞ whitespaces.
+        [\"')]  # Match '"', "'", or ")" once.
+    )?          # Close non-capturing group and match it either 0 or 1 times.
+    \s*         # Match between 0 and ∞ whitespaces.
+    $           # Match line end.""", re.VERBOSE | re.MULTILINE)
+
+REGEX_REFERENCE_LINK = re.compile(r"""
+    \s*         # Match between 0 and ∞ whitespaces.
+    (?<!\\)     # Ensure there's no escaping backslash.
+    (?:         # Open non-capturing group.
+        \[      # Match "[" once.
+        \s*     # Match between 0 and ∞ whitespaces.
+        (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+                # times as possible.
+        \s*     # Match between 0 and ∞ whitespaces.
+        \]      # Match "]" once.
+    )?          # Close non-capturing group and match it either 0 or 1 times.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \[          # Match "[" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \]          # Match "]" once.""", re.VERBOSE)
+
 REGEX_ORDERED_LIST = re.compile(r"""
     (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
             # times as possible, as either one or zero matches.
@@ -489,19 +539,21 @@ def convert_nested_tag(line, cur_tag, open_tags):
     return new_line
 
 
-def add_inline_tags(line):
+def add_inline_tags(line, references):
     """
     Add inline tags, such as <em> and <strong>, to a line.
 
     Args:
         line (str): Line to add tags to.
+        references (List[Dict]): A list of dictionaries, each containing
+            information about a reference-style link definition.
 
     Returns:
         line (str): Converted line.
     """
     # Add emphasis.
-    # The order here is important, otherwise "**bold**" would be converted
-    # to "*<em>bold</em>*", instead of "<strong>bold</strong>".
+    # The order here is important, otherwise "**bold**" would be converted to
+    # "*<em>bold</em>*", instead of "<strong>bold</strong>".
     line = REGEX_BOLD.sub("<strong>\\1\\2</strong>", line)
     line = REGEX_ITALIC.sub("<em>\\1\\2</em>", line)
 
@@ -516,19 +568,33 @@ def add_inline_tags(line):
             + '>', line)
     if REGEX_LINK.search(line):
         match = REGEX_LINK.search(line)
-        alt_text, url, title = match.groups()
+        text, url, title = match.groups()
         line = REGEX_LINK.sub(
             f'<a href="{url}"'
             + (f' title="{title}"' if title else '')
-            + f'>{alt_text}</a>', line)
+            + f'>{text}</a>', line)
 
-    # Add quick email links.
-    if REGEX_QUICK_EMAIL.search(line):
-        line = REGEX_QUICK_EMAIL.sub(f'<a href="mailto:\\1">\\1</a>', line)
+    # Add reference-style links.
+    if references:
+        matches = REGEX_REFERENCE_LINK.findall(line)
+        for match in matches:
+            text, label = match
+            for reference in references:
+                if label == reference["label"]:
+                    label, url, title = reference.values()
+                    line = REGEX_REFERENCE_LINK.sub(
+                        f'<a href="{url}"'
+                        + (f' title="{title}"' if title else '')
+                        + f'>{text if text else label}</a>', line, 1)
+                    break
 
     # Add quick links.
     if REGEX_QUICK_LINK.search(line):
-        line = REGEX_QUICK_LINK.sub(f'<a href="\\1">\\1</a>', line)
+        line = REGEX_QUICK_LINK.sub("<a href=\"\\1\">\\1</a>", line)
+
+    # Add quick links to email addresses.
+    if REGEX_QUICK_EMAIL.search(line):
+        line = REGEX_QUICK_EMAIL.sub("<a href=\"mailto:\\1\">\\1</a>", line)
     return line
 
 
@@ -542,6 +608,12 @@ def convert(string):
     Returns:
         new_string (str): HTML code.
     """
+    # Store reference-style link definitions.
+    keys = ("label", "url", "title")
+    references = [
+        dict(zip(keys, i)) for i in REGEX_REFERENCE_DEFINITION.findall(string)]
+    string = REGEX_REFERENCE_DEFINITION.sub("", string)
+
     if string.strip() == "":
         return ""
 
@@ -623,12 +695,12 @@ def convert(string):
             if code_snippets:
                 line = ""
                 for block in code_snippets:
-                    left = add_inline_tags(block["left"])
+                    left = add_inline_tags(block["left"], references)
                     line += left + f"<code>{block['content']}</code>"
                     if block == code_snippets[-1]:
-                        line += add_inline_tags(block["right"])
+                        line += add_inline_tags(block["right"], references)
             else:
-                line = add_inline_tags(line)
+                line = add_inline_tags(line, references)
 
             # Check if line contains nested tags, if so, open tags.
             if any(tag["regex"].fullmatch(line) for tag in NESTED_TAGS):
