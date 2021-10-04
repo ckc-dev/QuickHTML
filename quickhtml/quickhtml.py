@@ -560,19 +560,21 @@ def add_inline_tags(line, references):
     # Add images and links.
     # The order here is important, otherwise images wouldn't work.
     if REGEX_IMAGE.search(line):
-        match = REGEX_LINK.search(line)
-        alt_text, url, title = match.groups()
-        line = REGEX_IMAGE.sub(
-            f'<img src="{url}" alt="{alt_text}"'
-            + (f' title="{title}"' if title else '')
-            + '>', line)
+        matches = REGEX_LINK.findall(line)
+        for match in matches:
+            alt_text, url, title = match
+            line = REGEX_IMAGE.sub(
+                f'<img src="{url}" alt="{alt_text}"'
+                + (f' title="{title}"' if title else '')
+                + '>', line, 1)
     if REGEX_LINK.search(line):
-        match = REGEX_LINK.search(line)
-        text, url, title = match.groups()
-        line = REGEX_LINK.sub(
-            f'<a href="{url}"'
-            + (f' title="{title}"' if title else '')
-            + f'>{text}</a>', line)
+        matches = REGEX_LINK.findall(line)
+        for match in matches:
+            text, url, title = match
+            line = REGEX_LINK.sub(
+                f'<a href="{url}"'
+                + (f' title="{title}"' if title else '')
+                + f'>{text}</a>', line, 1)
 
     # Add reference-style links.
     if references:
