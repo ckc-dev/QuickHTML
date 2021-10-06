@@ -317,22 +317,21 @@ def check_paragraph(line):
         return False
 
     # Tags that do not need be enclosed in <p> tags:
-    INDEPENDENT_TAGS = {
-        "<h": r"""<h[1-6]>.+<\/h[1-6]>""",
-        "<a": r"""<a\s+href="[^"]+?"\s*(?:\s*title="[^"]+?")?>.+<\/a>""",
-        "<img": r"""<img\s+src="[^"]+?"\s*alt="[^"]+?"(?:\s*title="[^"]+?")?>""",
-        "<code": r"""<code>.+</code>""",
-        "<blockquote": r"""<blockquote>.+""",
-        "<ol": r"""<ol>.+""",
-        "<ul": r"""<ul>.+""",
-        "<pre": r"""<pre><code>.+""",
-    }
+    INDEPENDENT_TAG_REGEXES = [
+        r"""<h[1-6]>.+<\/h[1-6]>""",
+        r"""<a\s+href="[^"]+?"\s*(?:\s*title="[^"]+?")?>.+?<\/a>""",
+        r"""<img\s+src="[^"]+?"\s*alt="[^"]+?"(?:\s*title="[^"]+?")?>""",
+        r"""<code>.+</code>""",
+        r"""<blockquote>.+""",
+        r"""<ol>.+""",
+        r"""<ul>.+""",
+        r"""<pre><code>.+""",
+    ]
 
-    for tag, pattern in INDEPENDENT_TAGS.items():
-        if line.startswith(tag):
-            # If the line matches the pattern, it is not a paragraph.
-            return not re.fullmatch(pattern, line)
-    return True
+    for regex in INDEPENDENT_TAG_REGEXES:
+        line = re.sub(regex, "", line)
+
+    return False if line == "" else True
 
 
 def convert_nested_tag(line, cur_tag, open_tags):
