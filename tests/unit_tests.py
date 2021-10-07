@@ -1014,6 +1014,16 @@ class ImageTest(unittest.TestCase):
         self.assertEqual(CONVERT("This is an image ![     image     ](     Image path or URL.     \"This is a title.\"     ) inside a paragraph."),
                          "<p>This is an image <img src=\"Image path or URL.\" alt=\"image\" title=\"This is a title.\"> inside a paragraph.</p>")
 
+    def test_multiple(self):
+        self.assertEqual(CONVERT("![This is an image.](Image path or URL.)![This is another image.](Another image path or URL.)"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\"><img src=\"Another image path or URL.\" alt=\"This is another image.\">")
+        self.assertEqual(CONVERT("![This is an image.](Image path or URL.)![This is another image.](Another image path or URL.)![This is yet another image.](Yet another image path or URL.)"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\"><img src=\"Another image path or URL.\" alt=\"This is another image.\"><img src=\"Yet another image path or URL.\" alt=\"This is yet another image.\">")
+        self.assertEqual(CONVERT("![This is an image.](Image path or URL. \"Image title.\")![This is another image.](Another image path or URL. \"Another image title.\")"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\" title=\"Image title.\"><img src=\"Another image path or URL.\" alt=\"This is another image.\" title=\"Another image title.\">")
+        self.assertEqual(CONVERT("![This is an image.](Image path or URL. \"Image title.\")![This is another image.](Another image path or URL. \"Another image title.\")![This is yet another image.](Yet another image path or URL. \"Yet another image title.\")"),
+                         "<img src=\"Image path or URL.\" alt=\"This is an image.\" title=\"Image title.\"><img src=\"Another image path or URL.\" alt=\"This is another image.\" title=\"Another image title.\"><img src=\"Yet another image path or URL.\" alt=\"This is yet another image.\" title=\"Yet another image title.\">")
+
 
 class LineBreakTest(unittest.TestCase):
     def test_blockquote(self):
@@ -1143,6 +1153,24 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(CONVERT("This is a [     link     ](     Link URL.     \"This is a title.\"     ) inside a paragraph."),
                          "<p>This is a <a href=\"Link URL.\" title=\"This is a title.\">link</a> inside a paragraph.</p>")
 
+    def test_multiple(self):
+        self.assertEqual(CONVERT("[This is a link.](Link URL.)[This is another link.](Another link URL.)"),
+                         "<a href=\"Link URL.\">This is a link.</a><a href=\"Another link URL.\">This is another link.</a>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL.)[This is another link.](Another link URL.)[This is yet another link.](Yet another link URL.)"),
+                         "<a href=\"Link URL.\">This is a link.</a><a href=\"Another link URL.\">This is another link.</a><a href=\"Yet another link URL.\">This is yet another link.</a>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL.) [This is another link.](Another link URL.)"),
+                         "<p><a href=\"Link URL.\">This is a link.</a> <a href=\"Another link URL.\">This is another link.</a></p>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL.) [This is another link.](Another link URL.) [This is yet another link.](Yet another link URL.)"),
+                         "<p><a href=\"Link URL.\">This is a link.</a> <a href=\"Another link URL.\">This is another link.</a> <a href=\"Yet another link URL.\">This is yet another link.</a></p>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL. \"Link title.\")[This is another link.](Another link URL. \"Another link title.\")"),
+                         "<a href=\"Link URL.\" title=\"Link title.\">This is a link.</a><a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL. \"Link title.\")[This is another link.](Another link URL. \"Another link title.\")[This is yet another link.](Yet another link URL. \"Yet another link title.\")"),
+                         "<a href=\"Link URL.\" title=\"Link title.\">This is a link.</a><a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a><a href=\"Yet another link URL.\" title=\"Yet another link title.\">This is yet another link.</a>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL. \"Link title.\") [This is another link.](Another link URL. \"Another link title.\")"),
+                         "<p><a href=\"Link URL.\" title=\"Link title.\">This is a link.</a> <a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a></p>")
+        self.assertEqual(CONVERT("[This is a link.](Link URL. \"Link title.\") [This is another link.](Another link URL. \"Another link title.\") [This is yet another link.](Yet another link URL. \"Yet another link title.\")"),
+                         "<p><a href=\"Link URL.\" title=\"Link title.\">This is a link.</a> <a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a> <a href=\"Yet another link URL.\" title=\"Yet another link title.\">This is yet another link.</a></p>")
+
     def test_quick_link(self):
         self.assertEqual(CONVERT("<This should not be affected.>"),
                          "<p><This should not be affected.></p>")
@@ -1161,6 +1189,16 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(CONVERT("<https://example.link/with-dashes>"),
                          "<a href=\"https://example.link/with-dashes\">https://example.link/with-dashes</a>")
 
+    def test_quick_link_multiple(self):
+        self.assertEqual(CONVERT("<http://first.http.link><http://second.http.link>"),
+                         "<a href=\"http://first.http.link\">http://first.http.link</a><a href=\"http://second.http.link\">http://second.http.link</a>")
+        self.assertEqual(CONVERT("<http://first.http.link><http://second.http.link><http://third.http.link>"),
+                         "<a href=\"http://first.http.link\">http://first.http.link</a><a href=\"http://second.http.link\">http://second.http.link</a><a href=\"http://third.http.link\">http://third.http.link</a>")
+        self.assertEqual(CONVERT("<http://first.http.link> <http://second.http.link>"),
+                         "<p><a href=\"http://first.http.link\">http://first.http.link</a> <a href=\"http://second.http.link\">http://second.http.link</a></p>")
+        self.assertEqual(CONVERT("<http://first.http.link> <http://second.http.link> <http://third.http.link>"),
+                         "<p><a href=\"http://first.http.link\">http://first.http.link</a> <a href=\"http://second.http.link\">http://second.http.link</a> <a href=\"http://third.http.link\">http://third.http.link</a></p>")
+
     def test_quick_email(self):
         self.assertEqual(CONVERT("<This should not be affected.>"),
                          "<p><This should not be affected.></p>")
@@ -1178,6 +1216,16 @@ class LinkTest(unittest.TestCase):
                          "<a href=\"mailto:email.containing.dots@domain.example\">email.containing.dots@domain.example</a>")
         self.assertEqual(CONVERT("<email+containing+plus+signs@domain.example>"),
                          "<a href=\"mailto:email+containing+plus+signs@domain.example\">email+containing+plus+signs@domain.example</a>")
+
+    def test_quick_email_multiple(self):
+        self.assertEqual(CONVERT("<first@domain.example><second@domain.example>"),
+                         "<a href=\"mailto:first@domain.example\">first@domain.example</a><a href=\"mailto:second@domain.example\">second@domain.example</a>")
+        self.assertEqual(CONVERT("<first@domain.example><second@domain.example><third@domain.example>"),
+                         "<a href=\"mailto:first@domain.example\">first@domain.example</a><a href=\"mailto:second@domain.example\">second@domain.example</a><a href=\"mailto:third@domain.example\">third@domain.example</a>")
+        self.assertEqual(CONVERT("<first@domain.example> <second@domain.example>"),
+                         "<p><a href=\"mailto:first@domain.example\">first@domain.example</a> <a href=\"mailto:second@domain.example\">second@domain.example</a></p>")
+        self.assertEqual(CONVERT("<first@domain.example> <second@domain.example> <third@domain.example>"),
+                         "<p><a href=\"mailto:first@domain.example\">first@domain.example</a> <a href=\"mailto:second@domain.example\">second@domain.example</a> <a href=\"mailto:third@domain.example\">third@domain.example</a></p>")
 
     def test_reference_link(self):
         self.assertEqual(CONVERT("""
@@ -1259,6 +1307,69 @@ class LinkTest(unittest.TestCase):
 [     1     ]     :     <     Link URL.     >     (     This is a title.     )
 [     This is a link.     ]     [     1     ]
         """), "<a href=\"Link URL.\" title=\"This is a title.\">This is a link.</a>")
+
+    def test_reference_link_multiple(self):
+        self.assertEqual(CONVERT("""
+[1]: Link URL.
+[This is a link.][1][This is another link.][1]
+        """), "<a href=\"Link URL.\">This is a link.</a><a href=\"Link URL.\">This is another link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL.
+[2]: Another link URL.
+[This is a link.][1][This is another link.][2]
+        """), "<a href=\"Link URL.\">This is a link.</a><a href=\"Another link URL.\">This is another link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL.
+[2]: Another link URL.
+[3]: Yet another link URL.
+[This is a link.][1][This is another link.][2][Yet another link.][3]
+        """), "<a href=\"Link URL.\">This is a link.</a><a href=\"Another link URL.\">This is another link.</a><a href=\"Yet another link URL.\">Yet another link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL.
+[2]: Another link URL.
+[This is a link.][1] [This is another link.][2]
+        """), "<p><a href=\"Link URL.\">This is a link.</a> <a href=\"Another link URL.\">This is another link.</a></p>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL.
+[2]: Another link URL.
+[3]: Yet another link URL.
+[This is a link.][1] [This is another link.][2] [Yet another link.][3]
+        """), "<p><a href=\"Link URL.\">This is a link.</a> <a href=\"Another link URL.\">This is another link.</a> <a href=\"Yet another link URL.\">Yet another link.</a></p>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL. "Link title."
+[This is a link.][1][This is another link.][1]
+        """), "<a href=\"Link URL.\" title=\"Link title.\">This is a link.</a><a href=\"Link URL.\" title=\"Link title.\">This is another link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL. "Link title."
+[2]: Another link URL. "Another link title."
+[This is a link.][1][This is another link.][2]
+        """), "<a href=\"Link URL.\" title=\"Link title.\">This is a link.</a><a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL. "Link title."
+[2]: Another link URL. "Another link title."
+[3]: Yet another link URL. "Yet another link title."
+[This is a link.][1][This is another link.][2][Yet another link.][3]
+        """), "<a href=\"Link URL.\" title=\"Link title.\">This is a link.</a><a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a><a href=\"Yet another link URL.\" title=\"Yet another link title.\">Yet another link.</a>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL. "Link title."
+[2]: Another link URL. "Another link title."
+[This is a link.][1] [This is another link.][2]
+        """), "<p><a href=\"Link URL.\" title=\"Link title.\">This is a link.</a> <a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a></p>")
+
+        self.assertEqual(CONVERT("""
+[1]: Link URL. "Link title."
+[2]: Another link URL. "Another link title."
+[3]: Yet another link URL. "Yet another link title."
+[This is a link.][1] [This is another link.][2] [Yet another link.][3]
+        """), "<p><a href=\"Link URL.\" title=\"Link title.\">This is a link.</a> <a href=\"Another link URL.\" title=\"Another link title.\">This is another link.</a> <a href=\"Yet another link URL.\" title=\"Yet another link title.\">Yet another link.</a></p>")
 
 
 class OrderedListTest(unittest.TestCase):
