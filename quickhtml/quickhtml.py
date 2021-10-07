@@ -194,23 +194,23 @@ REGEX_REFERENCE_DEFINITION = re.compile(r"""
     $           # Match line end.""", re.VERBOSE | re.MULTILINE)
 
 REGEX_REFERENCE_LINK = re.compile(r"""
-    \s*         # Match between 0 and ∞ whitespaces.
     (?<!\\)     # Ensure there's no escaping backslash.
+    \[          # Match "[" once.
+    \s*         # Match between 0 and ∞ whitespaces.
+    (.+?)       # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+                # times as possible.
+    \s*         # Match between 0 and ∞ whitespaces.
+    \]          # Match "]" once.
+    \s*         # Match between 0 and ∞ whitespaces.
     (?:         # Open non-capturing group.
         \[      # Match "[" once.
         \s*     # Match between 0 and ∞ whitespaces.
-        (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
+        (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
                 # times as possible.
         \s*     # Match between 0 and ∞ whitespaces.
         \]      # Match "]" once.
-    )?          # Close non-capturing group and match it either 0 or 1 times.
-    \s*         # Match between 0 and ∞ whitespaces.
-    \[          # Match "[" once.
-    \s*         # Match between 0 and ∞ whitespaces.
-    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
-                # times as possible.
-    \s*         # Match between 0 and ∞ whitespaces.
-    \]          # Match "]" once.""", re.VERBOSE)
+    )?          # Close non-capturing group and match it either 0 or 1
+                # times.""", re.VERBOSE)
 
 REGEX_ORDERED_LIST = re.compile(r"""
     (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
@@ -582,6 +582,8 @@ def add_inline_tags(line, references):
         matches = REGEX_REFERENCE_LINK.findall(line)
         for match in matches:
             text, label = match
+            if not label:
+                label = text
             for reference in references:
                 if label == reference["label"]:
                     label, url, title = reference.values()
