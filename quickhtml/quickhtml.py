@@ -57,25 +57,24 @@ REGEX_ESCAPED_CHARACTER = re.compile(r"""
     (.) # CAPTURE GROUP (1) | Match any character once.""", re.VERBOSE)
 
 REGEX_HEADING = re.compile(r"""
-    ((?:^|>|-|[0-9]+[.\)])\s*)  # CAPTURE GROUP (1) | Match either line start,
-                                # ">", "-", or a number followed by either "."
-                                # or ")", then match between 0 and ∞
-                                # whitespaces.
-    (\#{1,6})                   # CAPTURE GROUP (2) | Match "#" between 1 and 6
-                                # times.
-    \s+                         # Match between 1 and ∞ whitespaces.
-    ([^\s].*?)                  # CAPTURE GROUP (3) | Match first character
-                                # that is not a whitespace, then match between
-                                # 0 and ∞ characters, as few times as possible.
-    (\s*)                       # CAPTURE GROUP (4) | Match between 0 and ∞
-                                # whitespaces.
-    $                           # Match line end.""", re.VERBOSE)
+    ((?:^|>|-|\d+[.\)])\s*) # CAPTURE GROUP (1) | Match either line start, ">",
+                            # "-", or a digit followed by either "." or ")",
+                            # then match between 0 and ∞ whitespaces.
+    (\#{1,6})               # CAPTURE GROUP (2) | Match "#" between 1 and 6
+                            # times.
+    \s+                     # Match between 1 and ∞ whitespaces.
+    ([^\s].*?)              # CAPTURE GROUP (3) | Match first character that is
+                            # not a whitespace, then match between 0 and ∞
+                            # characters, as few times as possible.
+    (\s*)                   # CAPTURE GROUP (4) | Match between 0 and ∞
+                            # whitespaces.
+    $                       # Match line end.""", re.VERBOSE)
 
 REGEX_HEADING__ALTERNATIVE_LEVEL_1 = re.compile(r"""
     (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
             # times as possible.
     \n      # Match a newline.
-    \s*     # Match between 1 and ∞ whitespaces.
+    \s*     # Match between 0 and ∞ whitespaces.
     ={2,}   # Match "=" between 2 and ∞ times.
     $       # Match line end.
 """, re.VERBOSE | re.MULTILINE)
@@ -84,7 +83,7 @@ REGEX_HEADING__ALTERNATIVE_LEVEL_2 = re.compile(r"""
     (.+?)   # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
             # times as possible.
     \n      # Match a newline.
-    \s*     # Match between 1 and ∞ whitespaces.
+    \s*     # Match between 0 and ∞ whitespaces.
     -{2,}   # Match "-" between 2 and ∞ times.
     $       # Match line end.
 """, re.VERBOSE | re.MULTILINE)
@@ -101,19 +100,19 @@ REGEX_IMAGE = re.compile(r"""
     !           # Match "!" once.
     \[          # Match "[" once.
     \s*         # Match between 0 and ∞ whitespaces.
-    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
+    (.+?)       # CAPTURE GROUP (1) | Match between 1 and ∞ characters, as few
                 # times as possible.
     \s*         # Match between 0 and ∞ whitespaces.
     \]          # Match "]" once.
     \(          # Match "(" once.
     \s*         # Match between 0 and ∞ whitespaces.
-    (.+?)       # CAPTURE GROUP (3) | Match between 1 and ∞ characters, as few
+    (.+?)       # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
                 # times as possible.
     \s*         # Match between 0 and ∞ whitespaces.
     (?:         # Open non-capturing group.
         [\"']   # Match either "'" or '"' once.
         \s*     # Match between 0 and ∞ whitespaces.
-        (.+?)   # CAPTURE GROUP (4) | Match between 1 and ∞ characters, as few
+        (.+?)   # CAPTURE GROUP (3) | Match between 1 and ∞ characters, as few
                 # times as possible.
         \s*     # Match between 0 and ∞ whitespaces.
         [\"']   # Match either "'" or '"' once.
@@ -213,9 +212,9 @@ REGEX_REFERENCE_LINK = re.compile(r"""
                 # times.""", re.VERBOSE)
 
 REGEX_ORDERED_LIST = re.compile(r"""
-    (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
-            # times as possible, as either one or zero matches.
-    [0-9]+  # Match between 1 and ∞ numbers.
+    (\s*)   # CAPTURE GROUP (1) | Match between 0 and ∞ whitespaces, as many
+            # times as possible.
+    \d+     # Match between 1 and ∞ digits.
     [.)]    # Match either "." or ")" once.
     \s+     # Match between 1 and ∞ whitespaces.
     (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
@@ -250,7 +249,7 @@ REGEX_QUICK_LINK = re.compile(r"""
                             # or 1 times.
         (?:                 # Open non-capturing group.
             [^\s/?.#->]+    # Match any character that is not a whitespace,
-                            # "/", "?", ".", "#", or "-", between 1 and ∞
+                            # "/", "?", ".", "#", "-", or ">", between 1 and ∞
                             # times.
             \.?             # Match ".", either 0 or 1 times.
         )+                  # Close non-capturing group and match it between 1
@@ -266,8 +265,8 @@ REGEX_QUICK_LINK = re.compile(r"""
     >                       # Match ">" once.""", re.VERBOSE)
 
 REGEX_UNORDERED_LIST = re.compile(r"""
-    (\s+)?  # CAPTURE GROUP (1) | Match between 1 and ∞ whitespaces, as many
-            # times as possible, as either one or zero matches.
+    (\s*)   # CAPTURE GROUP (1) | Match between 0 and ∞ whitespaces, as many
+            # times as possible.
     [-*+]+  # Match between 1 and ∞ "-", "*", or "+".
     \s+     # Match between 1 and ∞ whitespaces.
     (.+?)   # CAPTURE GROUP (2) | Match between 1 and ∞ characters, as few
@@ -333,7 +332,7 @@ def check_paragraph(line):
     for regex in INDEPENDENT_TAG_REGEXES:
         line = re.sub(regex, "", line)
 
-    return False if line == "" else True
+    return not line == ""
 
 
 def convert_nested_tag(line, cur_tag, open_tags):
@@ -561,7 +560,7 @@ def add_inline_tags(line, references):
     # Add images and links.
     # The order here is important, otherwise images wouldn't work.
     if REGEX_IMAGE.search(line):
-        matches = REGEX_LINK.findall(line)
+        matches = REGEX_IMAGE.findall(line)
         for match in matches:
             alt_text, url, title = match
             line = REGEX_IMAGE.sub(
@@ -614,9 +613,9 @@ def convert(string):
         new_string (str): HTML code.
     """
     # Store reference-style link definitions.
-    keys = ("label", "url", "title")
+    KEYS = ("label", "url", "title")
     references = [
-        dict(zip(keys, i)) for i in REGEX_REFERENCE_DEFINITION.findall(string)]
+        dict(zip(KEYS, i)) for i in REGEX_REFERENCE_DEFINITION.findall(string)]
     string = REGEX_REFERENCE_DEFINITION.sub("", string)
 
     if string.strip() == "":
