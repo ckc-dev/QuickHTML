@@ -1,13 +1,66 @@
-# QuickHTML
+# [QuickHTML](https://github.com/ckc-dev/QuickHTML)
 
 A simple Markdown to HTML preprocessor that doesn't require any third-party modules.
 
-Quickly generate HTML from Markdown, using python.
+Quickly generate HTML from Markdown, using Python.
 
 ## Technologies used
 
 - Python
 - RegEx
+
+## Table of contents
+
+- [QuickHTML](#quickhtml)
+  - [Technologies used](#technologies-used)
+  - [Table of contents](#table-of-contents)
+  - [File tree](#file-tree)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Supported syntax](#supported-syntax)
+  - [Headings](#headings)
+    - [Alternate heading syntax](#alternate-heading-syntax)
+  - [Paragraphs](#paragraphs)
+  - [Line breaks](#line-breaks)
+  - [Emphasis](#emphasis)
+    - [Bold](#bold)
+    - [Italic](#italic)
+    - [Bold and italic](#bold-and-italic)
+  - [Blockquotes](#blockquotes)
+  - [Lists](#lists)
+    - [Ordered lists](#ordered-lists)
+    - [Unordered lists](#unordered-lists)
+  - [Code](#code)
+    - [Escaping backticks](#escaping-backticks)
+    - [Code blocks](#code-blocks)
+  - [Horizontal Rules](#horizontal-rules)
+  - [Links](#links)
+    - [Adding titles to links](#adding-titles-to-links)
+    - [Emails and URLs](#emails-and-urls)
+    - [Reference-style links](#reference-style-links)
+      - [Formatting the reference](#formatting-the-reference)
+      - [Formatting the definition](#formatting-the-definition)
+  - [Images](#images)
+    - [Adding links to images](#adding-links-to-images)
+  - [Escaping characters](#escaping-characters)
+    - [Escape sequences](#escape-sequences)
+- [Contributing](#contributing)
+
+## File tree
+
+```
+QuickHTML
+├ LICENSE                   Project license.
+├ quickhtml/                Main module directory.
+│ ├ __init__.py             Executed when running the module directly.
+│ ├ __main__.py             Ensures Python treats this directory as a package.
+│ └ quickhtml.py            Main module file.
+├ README.md                 Project README.
+├ setup.py                  Module setup file.
+└ tests/                    Contains tests.
+  ├ integration_tests.py    Integration tests.
+  └ unit_tests.py           Unit tests.
+```
 
 # Installation
 
@@ -48,7 +101,7 @@ The `convert_file()` function accepts a file path, and returns the file content 
 
 ## Headings
 
-To create a heading, add a number of pound (`#`) signs before a word or phrase. The number of signs corresponds to the heading level, up to six levels. For example, to create a level three heading (`<h3>`), use three pound signs (`### This is a level three heading.`).
+To create a heading, add a number of pound signs (`#`) before a word or phrase. The number of signs corresponds to the heading level, up to six levels. For example, to create a level three heading, use three pound signs (`### This is a level three heading.`).
 
 <table>
     <thead>
@@ -92,7 +145,31 @@ To create a heading, add a number of pound (`#`) signs before a word or phrase. 
     </tbody>
 </table>
 
-_The alternate heading syntax, which uses the equals (`=`) and minus (`-`) signs is not supported at the moment._
+### Alternate heading syntax
+
+Alternatively, add two or more equal (`=`) or minus signs (`-`) to the line after the text to create level 1 and level 2 headings, respectively.
+
+<table>
+    <thead>
+        <tr>
+            <th>Markdown</th>
+            <th>HTML</th>
+            <th>Output</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>This is a level 1 heading.<br>====================</code></td>
+            <td><code>&lt;h1&gt;This is a level 1 heading.&lt;/h1&gt;</code></td>
+            <td><h1>This is a level 1 heading.</h1></td>
+        </tr>
+        <tr>
+            <td><code>This is a level 2 heading.<br>--------------------</code></td>
+            <td><code>&lt;h2&gt;This is a level 2 heading.&lt;/h2&gt;</code></td>
+            <td><h2>This is a level 2 heading.</h2></td>
+        </tr>
+    </tbody>
+</table>
 
 ## Paragraphs
 
@@ -108,7 +185,7 @@ Use a blank line to separate paragraphs.
     </thead>
     <tbody>
         <tr>
-            <td><pre>This <br>is <br>a <br>paragraph.</pre></td>
+            <td><pre>This<br>is<br>a<br>paragraph.</pre></td>
             <td><code>&lt;p&gt;This is a paragraph.&lt;/p&gt;</code></td>
             <td><p>This is a paragraph.</p></td>
         </tr>
@@ -140,6 +217,8 @@ End a line with two or more spaces to create a line break (`<br>`).
         </tr>
     </tbody>
 </table>
+
+Alternatively, the `<br>` tag can also be used directly to create line breaks, this is especially useful for adding line breaks in list and blockquote items.
 
 ## Emphasis
 
@@ -240,7 +319,7 @@ To make text bold and italic, add three asterisks (`***`) or underscores (`___`)
 
 ## Blockquotes
 
-To create a blockquote, add a number of greater than (`>`) signs before a paragraph. To nest blockquotes, add a number of signs that is greater or lesser than the last one. For example, a level 1 blockquote (`>`) followed by a level 2 blockquote (`>>`).
+To create a blockquote, add a number of greater than signs (`>`) before a paragraph. To nest blockquotes, add a number of signs that is greater or lesser than the last one. For example, a level 1 blockquote (`>`) followed by a level 2 blockquote (`>>`).
 
 <table>
     <thead>
@@ -279,7 +358,7 @@ To create a blockquote, add a number of greater than (`>`) signs before a paragr
     </tbody>
 </table>
 
-_At the moment, multiline items, such as multiline paragraphs, are not supported inside blockquotes. This means each line is a new item._
+_At the moment, multiline items, such as multiline paragraphs, are not supported inside blockquotes. This means each line is a new item. To add line breaks in blockquote elements, use `<br>` tags directly._
 
 ## Lists
 
@@ -333,7 +412,7 @@ To create an ordered list, add a number, followed by a period (`.`) or closing p
 
 ### Unordered lists
 
-To create an unordered list, add a dash (`-`), asterisk (`*`), or plus (`+`) sign, followed by a space before a paragraph. To nest unordered lists, add a number of spaces before the dash (`-`), asterisk (`*`), or plus (`+`) sign that is greater or lesser than the last number of spaces. For example, a level 1 unordered list (`- `) followed by a level 2 unordered list. (<code> - </code>)
+To create an unordered list, add a minus sign (`-`), asterisk (`*`), or plus sign (`+`), followed by a space before a paragraph. To nest unordered lists, add a number of spaces before the minus sign (`-`), asterisk (`*`), or plus sign (`+`) that is greater or lesser than the last number of spaces. For example, a level 1 unordered list (`- `) followed by a level 2 unordered list. (<code> - </code>)
 
 <table>
     <thead>
@@ -367,7 +446,7 @@ To create an unordered list, add a dash (`-`), asterisk (`*`), or plus (`+`) sig
     </tbody>
 </table>
 
-_At the moment, multiline items, such as multiline paragraphs, are not supported inside lists. This means each line is a new item._
+_At the moment, multiline items, such as multiline paragraphs, are not supported inside lists. This means each line is a new item. To add line breaks in list elements, use `<br>` tags directly._
 
 ## Code
 
@@ -428,9 +507,30 @@ If the word or phrase you want to denote as code includes one or more backticks,
 
 _Backticks can also be escaped using a backslash (see [escaping characters](#escaping-characters))_.
 
+### Code blocks
+
+Add at least four spaces at the start of each line to denote a section as a code block.
+
+<table>
+    <thead>
+        <tr>
+            <th>Markdown</th>
+            <th>HTML</th>
+            <th>Output</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><pre><code>    This<br>      is<br>        some<br>          text<br>        denoted<br>      as<br>    code.</code></pre></td>
+            <td><pre><code>&lt;pre&gt;&lt;code&gt;This<br>  is<br>    some<br>      text<br>    denoted<br>  as<br>code.&lt;/code&gt;&lt;/pre&gt;</code></pre></td>
+            <td><pre><code>This<br>  is<br>    some<br>      text<br>    denoted<br>  as<br>code.</code></pre></td>
+        </tr>
+    </tbody>
+</table>
+
 ## Horizontal Rules
 
-To create a horizontal rule, add three or more asterisks (`***`), minus (`---`) signs, or underscores (`___`) by themselves on a line.
+To create a horizontal rule, add three or more asterisks (`***`), minus signs (`---`), or underscores (`___`) by themselves on a line.
 
 <table>
     <thead>
@@ -526,6 +626,76 @@ A title can optionally be added to a link, it will appear as a tooltip when the 
     </tbody>
 </table>
 
+### Emails and URLs
+
+Emails and URLs can be quickly turned into links by being enclosed in angle brackets (`<>`).
+
+<table>
+    <thead>
+        <tr>
+            <th>Markdown</th>
+            <th>HTML</th>
+            <th>Output</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>&lt;https://github.com&gt;</code></td>
+            <td><code>&lt;a href="https://github.com"&gt;https://github.com&lt;/a&gt;</code></td>
+            <td><a href="https://github.com">https://github.com</a></td>
+        </tr>
+        <tr>
+            <td><code>&lt;example@email.address&gt;</code></td>
+            <td><code>&lt;a href="mailto:example@email.address"&gt;example@email.address&lt;/a&gt;</code></td>
+            <td><a href="mailto:example@email.address">example@email.address</a></td>
+        </tr>
+    </tbody>
+</table>
+
+### Reference-style links
+
+Reference-style links are made up of two parts: the first part is the link reference, which is used inline with the text, and the second is the link definition, which is stored somewhere else in the document. This makes the document easier to read, especially when containing multiple long links.
+
+#### Formatting the reference
+
+The link reference is formatted using two sets of brackets (`[]`). The first set encloses the text which should appear as a link, and the second set encloses the label of a link definition.
+
+#### Formatting the definition
+
+The link definition is formatted using a set of brackets (`[]`) which encloses the label to this definition, immediately followed by a colon (`:`), followed by the link URL, which can optionally be enclosed in angle brackets (`<>`), and finally, optionally followed by a title, which must be enclosed in single quotes (`''`), double quotes (`""`) or parentheses (`()`).
+
+<table>
+    <thead>
+        <tr>
+            <th>Markdown</th>
+            <th>HTML</th>
+            <th>Output</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>[Click me!][repository-url]<br><br>[repository-url]:https://github.com/ckc-dev/QuickHTML</code></td>
+            <td><code>&lt;a href="https://github.com/ckc-dev/QuickHTML"&gt;Click me!&lt;/a&gt;</code></td>
+            <td><a href="https://github.com/ckc-dev/QuickHTML">Click me!</a></td>
+        </tr>
+        <tr>
+            <td><code>Go to [GitHub][github-url]'s main page.<br><br>[github-url]:&lt;https://github.com/&gt;</code></td>
+            <td><code>&lt;p&gt;Go to &lt;a href="https://github.com/"&gt;GitHub&lt;/a&gt;'s main page.&lt;/p&gt;</code></td>
+            <td><p>Go to <a href="https://github.com/">GitHub</a>'s main page.</p></td>
+        </tr>
+        <tr>
+            <td><code>[Click me!][repository-url]<br><br>[repository-url]: https://github.com/ckc-dev/QuickHTML "Go to the main page of this repository."</code></td>
+            <td><code>&lt;a href="https://github.com/ckc-dev/QuickHTML" title="Go to the main page of this repository."&gt;Click me!&lt;/a&gt;</code></td>
+            <td><a href="https://github.com/ckc-dev/QuickHTML" title="Go to the main page of this repository.">Click me!</a></td>
+        </tr>
+        <tr>
+            <td><code>Go to [GitHub][github-url]'s main page.<br><br>[github-url]: &lt;https://github.com/&gt; (Click here to go to the main page of GitHub.)</code></td>
+            <td><code>&lt;p&gt;Go to &lt;a href="https://github.com/" title="Click here to go to the main page of GitHub."&gt;GitHub&lt;/a&gt;'s main page.&lt;/p&gt;</code></td>
+            <td><p>Go to <a href="https://github.com/" title="Click here to go to the main page of GitHub.">GitHub</a>'s main page.</p></td>
+        </tr>
+    </tbody>
+</table>
+
 ## Images
 
 To add an image, use an exclamation mark (`!`), followed by the image `alt` text enclosed in square brackets (`[]`), followed by the image's path or URL enclosed in parentheses (`()`). Titles can be optionally added to images, to add a title, enclose it in either single (`'`) or double (`"`) quotes after the URL.
@@ -607,3 +777,13 @@ Add a backslash (`\`) before a character to escape it, this is often used to dis
 ### Escape sequences
 
 You can use [escape sequences](https://docs.python.org/reference/lexical_analysis.html#literals) when passing strings directly to the `convert()` function.
+
+# Contributing
+
+Pull requests are welcome.
+
+Please open an issue to discuss what you'd like to change before making major changes.
+
+Please make sure to update and/or add appropriate tests when applicable.
+
+This project is licensed under the [GPL-3.0 License](https://github.com/ckc-dev/QuickHTML/blob/main/LICENSE).
