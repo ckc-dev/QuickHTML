@@ -318,7 +318,7 @@ def check_paragraph(line):
         return False
 
     # Tags that do not need be enclosed in <p> tags:
-    INDEPENDENT_TAG_REGEXES = [
+    INDEPENDENT_TAG_REGEXES = (
         r"""<h[1-6]>.+<\/h[1-6]>""",
         r"""<a\s+href="[^"]+?"\s*(?:\s*title="[^"]+?")?>.+?<\/a>""",
         r"""<img\s+src="[^"]+?"\s*alt="[^"]+?"(?:\s*title="[^"]+?")?>""",
@@ -327,7 +327,7 @@ def check_paragraph(line):
         r"""<ol>.+""",
         r"""<ul>.+""",
         r"""<pre><code>.+""",
-    ]
+    )
 
     for regex in INDEPENDENT_TAG_REGEXES:
         line = re.sub(regex, "", line)
