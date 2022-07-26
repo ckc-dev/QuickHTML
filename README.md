@@ -4,6 +4,12 @@ A simple Markdown to HTML preprocessor that doesn't require any third-party modu
 
 Quickly generate HTML from Markdown, using Python.
 
+## NOTE: This project is NOT actively maintained by me anymore.
+
+This is a project I made purely for educational purposes, with the goal of better understanding text manipulation/pre-processing and regular expressions, (and the process of building, releasing, distributing and maintaining an open source python module) in addition to HTML and Markdown syntax. You can use it if you want to, but there are many better solutions available that I would recommend instead. This project implements [most of the basic Markdown syntax](#supported-syntax), and while it has everything I needed and served me well for my purposes at the time, it's not as complete and reliable as other preprocessors are, since, again, it's just a simple educational project.
+
+With that said, please note that while I may make small changes, such as refactoring code from time to time, I am no longer actively maintaining this project, so open issues may not be resolved unless by pull requests and collaboration from other users. If you would like to contribute to this project, I am more than willing to review and accept pull requests.
+
 ## Technologies used
 
 - Python
