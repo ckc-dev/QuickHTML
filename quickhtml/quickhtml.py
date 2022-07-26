@@ -332,7 +332,7 @@ def check_paragraph(line):
     for regex in INDEPENDENT_TAG_REGEXES:
         line = re.sub(regex, "", line)
 
-    return not line == ""
+    return line != ""
 
 
 def convert_nested_tag(line, cur_tag, open_tags):
