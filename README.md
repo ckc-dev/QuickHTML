@@ -58,8 +58,8 @@ With that said, please note that while I may make small changes, such as refacto
 QuickHTML
 ├ LICENSE                   Project license.
 ├ quickhtml/                Main module directory.
-│ ├ __init__.py             Executed when running the module directly.
-│ ├ __main__.py             Ensures Python treats this directory as a package.
+│ ├ __init__.py             Ensures Python treats this directory as a package.
+│ ├ __main__.py             Executed when running the module directly.
 │ └ quickhtml.py            Main module file.
 ├ README.md                 Project README.
 ├ setup.py                  Module setup file.
