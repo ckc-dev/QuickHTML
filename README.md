@@ -1,10 +1,14 @@
 # [QuickHTML](https://github.com/ckc-dev/QuickHTML)
 
+[![Downloads](https://static.pepy.tech/badge/quickhtml)](https://pepy.tech/project/quickhtml)
+[![Downloads/month](https://static.pepy.tech/badge/quickhtml/month)](https://pepy.tech/project/quickhtml)
+[![Downloads](https://static.pepy.tech/badge/quickhtml/week)](https://pepy.tech/project/quickhtml)
+
 A simple Markdown to HTML preprocessor that doesn't require any third-party modules.
 
 Quickly generate HTML from Markdown, using Python.
 
-## NOTE: This project is NOT actively maintained by me anymore.
+## NOTE: This project is NOT actively maintained by me anymore
 
 This is a project I made purely for educational purposes, with the goal of better understanding text manipulation/pre-processing and regular expressions, (and the process of building, releasing, distributing and maintaining an open source python module) in addition to HTML and Markdown syntax. You can use it if you want to, but there are many better solutions available that I would recommend instead. This project implements [most of the basic Markdown syntax](#supported-syntax), and while it has everything I needed and served me well for my purposes at the time, it's not as complete and reliable as other preprocessors are, since, again, it's just a simple educational project.
 
@@ -372,7 +376,7 @@ Items can be organized into ordered and unordered lists.
 
 ### Ordered lists
 
-To create an ordered list, add a number, followed by a period (`.`) or closing parenthesis (`)`), followed by a space before a paragraph. The numbers do not have to be in numerical order. To nest ordered lists, add a number of spaces before the number that is greater or lesser than the last number of spaces. For example, a level 1 ordered list (`1. `) followed by a level 2 ordered list. (<code> 1. </code>)
+To create an ordered list, add a number, followed by a period (`.`) or closing parenthesis (`)`), followed by a space before a paragraph. The numbers do not have to be in numerical order. To nest ordered lists, add a number of spaces before the number that is greater or lesser than the last number of spaces. For example, a level 1 ordered list (`1.`) followed by a level 2 ordered list. (<code> 1. </code>)
 
 <table>
     <thead>
@@ -418,7 +422,7 @@ To create an ordered list, add a number, followed by a period (`.`) or closing p
 
 ### Unordered lists
 
-To create an unordered list, add a minus sign (`-`), asterisk (`*`), or plus sign (`+`), followed by a space before a paragraph. To nest unordered lists, add a number of spaces before the minus sign (`-`), asterisk (`*`), or plus sign (`+`) that is greater or lesser than the last number of spaces. For example, a level 1 unordered list (`- `) followed by a level 2 unordered list. (<code> - </code>)
+To create an unordered list, add a minus sign (`-`), asterisk (`*`), or plus sign (`+`), followed by a space before a paragraph. To nest unordered lists, add a number of spaces before the minus sign (`-`), asterisk (`*`), or plus sign (`+`) that is greater or lesser than the last number of spaces. For example, a level 1 unordered list (`-`) followed by a level 2 unordered list. (<code> - </code>)
 
 <table>
     <thead>
